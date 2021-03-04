@@ -23,6 +23,8 @@ GET         /messages                                   Outbox.All
 # API Routes
 POST        /api/v1/user                                UsersAPI.Save
 
+POST        /api/v1/aft                                 SMSApi.SendToAT
+
 # Ignore favicon requests
 GET         /favicon.ico                                Static.Serve("public/img","favicon.png")
 

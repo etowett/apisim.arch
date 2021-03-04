@@ -2,11 +2,13 @@ package forms
 
 import "github.com/revel/revel"
 
-type Login struct {
-	Username string
-	Password string
-	Remember bool
-}
+type (
+	Login struct {
+		Username string
+		Password string
+		Remember bool
+	}
+)
 
 func (login *Login) Validate(v *revel.Validation) {
 	ValidateLoginUsername(v, login.Username).Key("login.Username")

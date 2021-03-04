@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"apisim/app/db"
+	"apisim/app/entities"
 	"apisim/app/forms"
 	"apisim/app/models"
 	"apisim/app/routes"
@@ -107,16 +108,23 @@ func (c *Users) Logout() revel.Result {
 
 func (c *Users) Get(id int64) revel.Result {
 	newUser := models.User{}
-	user, err := newUser.GetByID(c.Request.Context(), db.DB(), id)
+	foundUser, err := newUser.GetByID(c.Request.Context(), db.DB(), id)
 	if err != nil {
 		if err.Error() == "record not found" {
-			result := response(err.Error(), "data not found", "fail")
-			return c.Render(result)
+			return c.Render(entities.Response{
+				Success: false,
+				Message: "Record not found!",
+			})
 		}
-		result := response(err.Error(), "error get user", "failed")
-		return c.Render(result)
+		c.Log.Errorf("Failed to get user with id=[%+v], %v", id, err)
+		return c.Render(entities.Response{
+			Success: false,
+			Message: "Error getting the user!",
+		})
 	}
 
-	result := response(user, "get user successfull", "success")
-	return c.Render(result)
+	return c.Render(entities.Response{
+		Success: true,
+		Data:    foundUser,
+	})
 }
