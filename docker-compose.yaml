@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  apisim:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.local
+    ports:
+      - 4027:4027
+    volumes:
+      - .:/apisim
+    environment:
+      - ENV=dev
+      - DB_URL=postgres://apisim:apisim@postgres/apisim?sslmode=disable
+      - REDIS_URL=redis://:MDNcVb924a@redis:6379
+
+  postgres:
+    image: postgres:13.2-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/apisim/pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=apisim
+      - POSTGRES_USER=apisim
+      - POSTGRES_DB=apisim
+
+  redis:
+    image: redis:6.0-alpine
+    ports:
+      - 6379:6379
+    command: redis-server --requirepass MDNcVb924a

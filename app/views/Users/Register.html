@@ -1,0 +1,86 @@
+{{set . "title" "Apisim - Register"}}
+{{template "header.html" .}}
+
+  <div class="col-md-6 offset-md-2">
+    <h1>Register</h1>
+
+    {{if .errors}}
+    <div class="alert alert-danger alert-dismissible fade show">
+      <strong>Failed!</strong> Please fix errors marked below!
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {{end}}
+
+    <form action="{{url "Users.Save"}}" id="register" method="POST" class="form-horizontal" role="form">
+
+      {{with $field := field "user.Username" .}}
+      <div class="form-group row {{if $field.Error}}has-error{{end}}">
+        <label class="col-sm-3 col-form-label" for="{{$field.Name}}">Username</label>
+        <div class="col-sm-9">
+          <input type="text" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control" placeholder="Username" value="{{$field.Flash}}" autofocus />
+          <span class="help-block text-danger">{{$field.Error}}</span>
+        </div>
+      </div>
+      {{ end }}
+
+      {{with $field := field "user.FirstName" .}}
+      <div class="form-group row {{if $field.Error}}has-error{{end}}">
+        <label class="col-sm-3 col-form-label" for="{{$field.Name}}">First Name</label>
+        <div class="col-sm-9">
+          <input type="text" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control" placeholder="First Name" value="{{$field.Flash}}" />
+          <span class="help-block text-danger">{{$field.Error}}</span>
+        </div>
+      </div>
+      {{ end }}
+
+      {{with $field := field "user.LastName" .}}
+      <div class="form-group row {{if $field.Error}}has-error{{end}}">
+        <label class="col-sm-3 col-form-label" for="{{$field.Name}}">Last Name</label>
+        <div class="col-sm-9">
+          <input type="text" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control" placeholder="Last Name" value="{{$field.Flash}}" />
+          <span class="help-block text-danger">{{$field.Error}}</span>
+        </div>
+      </div>
+      {{ end }}
+
+      {{with $field := field "user.Email" .}}
+      <div class="form-group row {{if $field.Error}}has-error{{end}}">
+        <label class="col-sm-3 col-form-label" for="{{$field.Name}}">Email</label>
+        <div class="col-sm-9">
+          <input type="email" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control" placeholder="Email" value="{{$field.Flash}}" />
+          <span class="help-block text-danger">{{$field.Error}}</span>
+        </div>
+      </div>
+      {{ end }}
+
+      {{with $field := field "user.Password" .}}
+      <div class="form-group row {{if $field.Error}}has-error{{end}}">
+        <label class="col-sm-3 col-form-label" for="{{$field.Name}}">Password</label>
+        <div class="col-sm-9">
+          <input type="password" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control" placeholder="Password" value="{{$field.Flash}}" />
+          <span class="help-block text-danger">{{$field.Error}}</span>
+        </div>
+      </div>
+      {{ end }}
+
+      {{with $field := field "user.PasswordConfirmation" .}}
+      <div class="form-group row {{if $field.Error}}has-error{{end}}">
+        <label class="col-sm-3 col-form-label" for="{{$field.Name}}">Password Confirmation</label>
+        <div class="col-sm-9">
+          <input type="password" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control" placeholder="Password Confirmation" value="{{$field.Flash}}" />
+          <span class="help-block text-danger">{{$field.Error}}</span>
+        </div>
+      </div>
+      {{ end }}
+
+      <div class="form-group row">
+        <div class="col-sm-10">
+          <button type="submit" class="btn btn-primary">Register</button>
+          <a href="{{url "Users.Login"}}" type="submit" class="btn btn-default">Login</a>
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+{{template "footer.html" .}}
