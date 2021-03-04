@@ -36,8 +36,13 @@ func init() {
 	// revel.DevMode and revel.RunMode only work inside of OnAppStart. See Example Startup Script
 	// ( order dependent )
 	// revel.OnAppStart(ExampleStartupScript)
-	revel.OnAppStart(db.InitDB)
+	revel.OnAppStart(initDB)
 	// revel.OnAppStart(FillCache)
+}
+
+func initDB() {
+	db.InitDB()
+	defer db.DB().Close()
 }
 
 // HeaderFilter adds common security headers
