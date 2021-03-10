@@ -4,7 +4,6 @@ import (
 	"apisim/app/db"
 	"context"
 	"database/sql"
-	"fmt"
 )
 
 const (
@@ -27,9 +26,9 @@ type (
 	}
 )
 
-func (u *User) String() string {
-	return fmt.Sprintf("User(%s)", u.Username)
-}
+// func (u *User) String() string {
+// 	return fmt.Sprintf("User(%s)", u.Username)
+// }
 
 func (u *User) GetByID(
 	ctx context.Context,

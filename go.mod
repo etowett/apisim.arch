@@ -6,6 +6,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b // indirect
 	github.com/garyburd/redigo v1.6.2 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/gomodule/redigo v1.8.4
 	github.com/google/uuid v1.2.0
 	github.com/inconshreveable/log15 v0.0.0-20201112154412-8562bdadbbac // indirect
 	github.com/lib/pq v1.9.0

@@ -42,7 +42,6 @@ func init() {
 
 func initDB() {
 	db.InitDB()
-	defer db.DB().Close()
 }
 
 // HeaderFilter adds common security headers

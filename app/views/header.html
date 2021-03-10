@@ -26,13 +26,17 @@
 
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a class="nav-link active" href="#">Messages</span></a>
-            </li>
+
 
             {{if .user}}
               <li class="nav-item">
-                <a href="{{url "Users.Get" .user.ID}}" class="nav-link">Connected as {{.user.Username}}</a>
+                <a class="nav-link active" href="#">Messages</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="{{url "Settings.Index"}}">Settings</span></a>
+              </li>
+              <li class="nav-item">
+                <a href="{{url "Users.Get" .user.ID}}" class="nav-link">Hello {{.user.Username}}</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{{url "Users.Logout"}}">Logout</a>

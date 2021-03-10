@@ -11,6 +11,13 @@ GET         /                                           App.Index
 GET         /health                                     App.Health
 GET         /dash                                       App.Dash
 
+GET         /settings                                   Settings.Index
+GET         /settings/api-keys                          Settings.ApiKeys
+GET         /settings/api-keys/new                      Settings.ApiKeyAdd
+POST        /settings/api-keys/new                      Settings.ApiKeySave
+GET         /settings/api-keys/:id                      Settings.ApiKeyDetails
+GET         /settings/api-keys/delete/:id               Settings.DeleteApiKey
+
 GET         /register                                   Users.Register
 POST        /register                                   Users.Save
 GET         /login                                      Users.Login

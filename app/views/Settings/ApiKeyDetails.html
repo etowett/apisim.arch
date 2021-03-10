@@ -1,0 +1,35 @@
+{{set . "title" "ApiKey Details"}}
+{{template "header.html" .}}
+
+  <h1>ApiKey Details</h1>
+
+  {{if not .result.Success}}
+  <div class="alert alert-danger alert-dismissible fade show">
+    <strong>Failed!</strong> {{.result.Message}}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+  {{end}}
+
+  <div class="api-key">
+    {{if .result.Data.ApiKey}}
+      {{with .result.Data.ApiKey}}
+        <p>
+          <small>Created on <i>{{.CreatedAt}}</i></small>
+        </p>
+        <p>
+          Provider: {{.Provider}} <br />
+          Name: {{.Name}} <br />
+          AccessID: {{.AccessID}} <br />
+          {{if $.result.Data.Secret}}
+            <span class="text-danger">Please note that this secret is only shown once. Keep it safe</span><br />
+            Access Secret: {{$.result.Data.Secret}}<br />
+          {{end}}
+        </p>
+        <p>
+            <a href="{{url "Settings.DeleteApiKey" .ID}}" onclick="return confirm('Are you sure?')">Delete</a>
+        </p>
+      {{end}}
+    {{end}}
+  </div>
+
+{{template "footer.html" .}}

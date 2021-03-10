@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 
 services:
   apisim:
@@ -13,6 +13,16 @@ services:
       - ENV=dev
       - DB_URL=postgres://apisim:apisim@postgres/apisim?sslmode=disable
       - REDIS_URL=redis://:MDNcVb924a@redis:6379
+
+  workwebui:
+    image: ektowett/workwebui:latest
+    ports:
+      - 5040:5040
+    depends_on:
+      - redis
+    environment:
+      - REDIS_NAMESPACE=komsner
+      - REDIS_HOST=redis://:MDNcVb924a@redis:6379
 
   postgres:
     image: postgres:13.2-alpine

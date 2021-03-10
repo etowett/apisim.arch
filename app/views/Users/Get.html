@@ -1,0 +1,17 @@
+{{set . "title" "Apisim - User Profile"}}
+{{template "header.html" .}}
+
+  <div class="py-5 px-3">
+    <h1>User Profile</h1>
+    <div class="user">
+      {{with .result.Data}}
+        <p>First name: {{.FirstName}}</p>
+        <p>Last name: {{.LastName}}</p>
+        <p>Email: {{.Email}}</p>
+        <p>Username: {{.Username}}</p>
+      {{end}}
+    </div>
+
+  </div>
+
+{{template "footer.html" .}}

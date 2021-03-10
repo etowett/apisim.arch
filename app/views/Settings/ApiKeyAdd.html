@@ -1,0 +1,66 @@
+{{set . "title" "Apisim - Add Api Key"}}
+{{template "header.html" .}}
+
+  <div class="py-5 px-3">
+    <h1>Add Api Key</h1>
+
+    <form action="{{url "Settings.ApiKeySave"}}" id="apiKey-add" method="POST" class="form-horizontal" role="form">
+      {{ with $field := field "apiKey.UserID" . }}
+      <input type="hidden" name="{{$field.Name}}" id="{{$field.Name}}" value="{{$.user.ID}}" />
+      <span class="help-block text-danger">{{$field.Error}}</span>
+      {{end}}
+
+      {{with $field := field "apiKey.Provider" .}}
+      <div class="form-group row {{if $field.Error}}has-error{{end}}">
+        <label class="col-sm-2 col-form-label" for="{{$field.Name}}">Provider</label>
+        <div class="col-sm-10">
+          <select class="custom-select mr-sm-2" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control">
+            <option selected value="">-</option>
+            <option value="at">Africas Talking</option>
+            <option value="rm">Route Mobile</option>
+          </select>
+          <span class="help-block text-danger">{{$field.Error}}</span>
+        </div>
+      </div>
+      {{ end }}
+
+      {{with $field := field "apiKey.Name" .}}
+      <div class="form-group row {{if $field.Error}}has-error{{end}}">
+        <label class="col-sm-2 col-form-label" for="{{$field.Name}}">Name</label>
+        <div class="col-sm-10">
+          <input type="text" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control" placeholder="Name" value="{{$field.Flash}}" autofocus />
+          <span class="help-block text-danger">{{$field.Error}}</span>
+        </div>
+      </div>
+      {{ end }}
+
+      {{with $field := field "apiKey.Username" .}}
+      <div class="form-group row {{if $field.Error}}has-error{{end}}">
+        <label class="col-sm-2 col-form-label" for="{{$field.Name}}">Username</label>
+        <div class="col-sm-10">
+          <input type="text" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control" placeholder="Username" value="{{$field.Flash}}" />
+          <span class="help-block text-danger">{{$field.Error}}</span>
+        </div>
+      </div>
+      {{ end }}
+
+      {{with $field := field "apiKey.DlrURL" .}}
+      <div class="form-group row {{if $field.Error}}has-error{{end}}">
+        <label class="col-sm-2 col-form-label" for="{{$field.Name}}">DlrURL</label>
+        <div class="col-sm-10">
+          <input type="text" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control" placeholder="DlrURL(optional)" value="{{$field.Flash}}" />
+          <span class="help-block text-danger">{{$field.Error}}</span>
+        </div>
+      </div>
+      {{ end }}
+
+      <div class="form-group row">
+        <div class="col-sm-10">
+          <button type="submit" class="btn btn-primary">Add</button>
+          <a href="{{url "Settings.ApiKeys"}}" type="submit" class="btn btn-danger">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+{{template "footer.html" .}}

@@ -1,0 +1,48 @@
+{{set . "title" "Komsner - ApiKeys"}}
+{{template "header.html" .}}
+
+  <h1>ApiKeys</h1>
+
+  <p><a href="{{url "Settings.ApiKeyAdd"}}">Add api key</a></p>
+
+  {{if not .result.Success}}
+  <div class="alert alert-danger alert-dismissible fade show">
+    <strong>Failed!</strong> {{.result.Message}}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+  {{end}}
+
+  <div class="api-keys">
+  {{if .result.Data.ApiKeys}}
+  {{ template "paginate.html" .result.Data.Pagination}}
+  <table class="table">
+      <thead>
+      <tr>
+          <th>Name</th>
+          <th>AccessID</th>
+          <th>Provider</th>
+          <th>CreatedAt</th>
+          <th>-</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{range .result.Data.ApiKeys}}
+      <tr>
+          <td><a href="{{url "Settings.ApiKeyDetails" .ID}}">{{.Name}}</a></td>
+          <td>{{.AccessID}}</td>
+          <td>{{.Provider}}</td>
+          <td>{{.CreatedAt}}</td>
+          <td>
+            <a href="{{url "Settings.DeleteApiKey" .ID}}" onclick="return confirm('Are you sure?')">Delete</a>
+          </td>
+      </tr>
+      {{end}}
+      </tbody>
+  </table>
+  {{else}}
+  <p>
+    No ApiKeys
+  </p>
+  {{end}}
+
+{{template "footer.html" .}}
