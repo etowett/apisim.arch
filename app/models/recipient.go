@@ -14,7 +14,7 @@ const (
 	createRecipientSQL         = `insert into recipients (message_id, phone, api_id, route, cost, currency, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) returning id`
 	selectRecipientSQL         = `select r.id, r.message_id, r.phone, d.status, d.reason, r.api_id, r.route, r.cost, r.currency, r.created_at from recipients r left join dlrs d on r.id = d.recipient_id`
 	selectMessageRecipientsSQL = selectRecipientSQL + ` where message_id=$1`
-	countRecipientSQL          = `select count(id) from recipients`
+	countRecipientSQL          = `select count(r.id) from recipients r`
 )
 
 type (

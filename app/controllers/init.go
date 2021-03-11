@@ -4,6 +4,7 @@ import (
 	"apisim/app/db"
 	"apisim/app/jobs"
 	"apisim/app/jobs/job_handlers"
+	"apisim/app/providers"
 	"apisim/app/work"
 	"context"
 	"time"
@@ -14,6 +15,7 @@ import (
 var (
 	jobEnqueuer  *work.AppJobEnqueuer
 	redisManager *db.AppRedis
+	csvCreator   *providers.SimpleCSVCreator
 )
 
 func init() {

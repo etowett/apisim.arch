@@ -1,7 +1,45 @@
-{{set . "title" "Apisim - Outbox"}}
+{{set . "title" "Outbox"}}
 {{template "header.html" .}}
 
-<h1>Outbox</h1>
-<p>All messages here. <a href="#">Send message</a>.</p>
+  <h1>Outbox</h1>
+
+  {{if not .result.Success}}
+  <div class="alert alert-danger alert-dismissible fade show">
+    <strong>Failed!</strong> {{.result.Message}}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+  {{end}}
+
+  <div class="messages">
+  {{if .result.Data.Messages}}
+  {{ template "paginate.html" .result.Data.Pagination}}
+  <p><a href="{{url "Outbox.ExportAll"}}" class="btn btn-primary">Export</a></p>
+  <table class="table">
+      <thead>
+      <tr>
+          <th>SenderID</th>
+          <th>Message</th>
+          <th>Recs</th>
+          <th>Cost</th>
+          <th>CreatedAt</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{range .result.Data.Messages}}
+      <tr>
+          <td>{{.SenderID}}</td>
+          <td><a href="{{url "Outbox.Get" .ID}}">{{.Message}}</a></td>
+          <td>{{.RecipientCount}}</td>
+          <td>{{.Currency}} {{.Cost}}</td>
+          <td>{{.CreatedAt}}</td>
+      </tr>
+      {{end}}
+      </tbody>
+  </table>
+  {{else}}
+  <p>
+    No Messages
+  </p>
+  {{end}}
 
 {{template "footer.html" .}}

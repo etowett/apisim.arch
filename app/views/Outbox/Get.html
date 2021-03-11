@@ -1,0 +1,62 @@
+{{set . "title" "Outbox Details"}}
+{{template "header.html" .}}
+
+  <h1>Outbox Details</h1>
+
+  {{if not .result.Success}}
+  <div class="alert alert-danger alert-dismissible fade show">
+    <strong>Failed!</strong> {{.result.Message}}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+  {{end}}
+
+  <div class="message">
+    {{if .result.Data.Message}}
+      {{with .result.Data.Message}}
+        <h3>Message details</h3>
+        <p>
+          <small>Sent on <i>{{.SentAt}}</i></small>
+        </p>
+        <p>
+          Message: {{.Message}} <br />
+          SenderID:{{.SenderID}} <br />
+        </p>
+      {{end}}
+    {{end}}
+  </div>
+  <hr />
+  <div class="recipients">
+  {{if .result.Data.Recipients}}
+  {{ template "paginate.html" .result.Data.Pagination}}
+  <table class="table">
+      <thead>
+      <tr>
+          <th>Phone</th>
+          <th>Cost</th>
+          <th>Status</th>
+          <th>Reason</th>
+          <th>Route</th>
+          <th>Cost</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{range .result.Data.Recipients}}
+      <tr>
+          <td>{{.Phone}}</td>
+          <td>{{.Currency}} {{.Cost}}</td>
+          <td>{{.Status.Value}}</td>
+          <td>{{.Reason.Value}}</td>
+          <td>{{.Route}}</td>
+          <td>{{.Currency}} {{.Cost}}</td>
+      </tr>
+      {{end}}
+      </tbody>
+  </table>
+  {{else}}
+  <p>
+    No Recipients
+  </p>
+  {{end}}
+  </div>
+
+{{template "footer.html" .}}

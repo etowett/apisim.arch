@@ -20,13 +20,14 @@ const (
 type (
 	Message struct {
 		SequentialIdentifier
-		UserID   int64     `json:"user_id"`
-		SenderID string    `json:"sender_id"`
-		Meta     string    `json:"meta"`
-		Message  string    `json:"message"`
-		Cost     float64   `json:"cost"`
-		Currency string    `json:"currency"`
-		SentAt   time.Time `json:"sent_at"`
+		UserID         int64     `json:"user_id"`
+		SenderID       string    `json:"sender_id"`
+		Meta           string    `json:"meta"`
+		Message        string    `json:"message"`
+		Cost           float64   `json:"cost"`
+		Currency       string    `json:"currency"`
+		SentAt         time.Time `json:"sent_at"`
+		RecipientCount int       `json:"recipient_count"`
 		Timestamps
 	}
 )

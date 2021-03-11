@@ -26,6 +26,8 @@ GET         /logout                                     Users.Logout
 GET         /user/:id                                   Users.Get
 
 GET         /messages                                   Outbox.All
+GET         /messages/export                            Outbox.ExportAll
+GET         /messages/:id                               Outbox.Get
 
 # API Routes
 POST        /api/v1/user                                UsersAPI.Save
