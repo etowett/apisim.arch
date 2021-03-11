@@ -15,11 +15,11 @@ type Users struct {
 	App
 }
 
-func (c Users) Register() revel.Result {
+func (c *Users) Register() revel.Result {
 	return c.Render()
 }
 
-func (c Users) Save(user *forms.User) revel.Result {
+func (c *Users) Save(user *forms.User) revel.Result {
 	v := c.Validation
 	user.Validate(v)
 	if v.HasErrors() {
@@ -63,7 +63,7 @@ func (c Users) Login() revel.Result {
 	return c.Render()
 }
 
-func (c Users) DoLogin(login *forms.Login) revel.Result {
+func (c *Users) DoLogin(login *forms.Login) revel.Result {
 	v := c.Validation
 	login.Validate(v)
 

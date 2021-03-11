@@ -10,14 +10,15 @@ import (
 
 type (
 	Redis interface {
-		Float64(key string) (float64, error)
-		Get(key string) (interface{}, error)
-		GetString(key string) (string, error)
-		Int64(key string) (int64, error)
-		IsErrNil(err error) bool
-		Set(key string, val interface{}) (interface{}, error)
-		SetEx(key string, ttl time.Duration, val interface{}) (interface{}, error)
-		String(key string) (string, error)
+		Del(string) error
+		Float64(string) (float64, error)
+		Get(string) (interface{}, error)
+		GetString(string) (string, error)
+		Int64(string) (int64, error)
+		IsErrNil(error) bool
+		Set(string, interface{}) (interface{}, error)
+		SetEx(string, time.Duration, interface{}) (interface{}, error)
+		String(string) (string, error)
 	}
 
 	RedisConfig struct {
@@ -44,9 +45,9 @@ func NewRedisProviderWithParams(
 	urlStr string,
 	config *RedisConfig,
 ) *AppRedis {
-	idleTimeout := 2 * time.Minute
-	maxActive := 200
-	maxIdle := 5
+	idleTimeout := 1 * time.Minute
+	maxActive := 400
+	maxIdle := 75
 
 	if config != nil {
 		if int64(config.IdleTimeout) != 0 {
@@ -99,6 +100,12 @@ func NewRedisProviderWithParams(
 	return &AppRedis{
 		pool: redisPool,
 	}
+}
+
+func (p *AppRedis) Del(
+	key string,
+) (interface{}, error) {
+	return p.do("DEL", key)
 }
 
 func (p *AppRedis) Float64(

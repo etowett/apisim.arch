@@ -163,7 +163,17 @@ func (c *Settings) ApiKeyDetails(id int64) revel.Result {
 
 func (c *Settings) DeleteApiKey(id int64) revel.Result {
 	newApiKey := &models.ApiKey{}
-	err := newApiKey.Delete(c.Request.Context(), db.DB(), id)
+	theApiKey, err := newApiKey.ByID(c.Request.Context(), db.DB(), id)
+	if err != nil {
+		c.Log.Errorf("error newApiKey by id %v: %v", id, err)
+	}
+
+	_, err = redisManager.Del(c.generateCacheKey(theApiKey.Provider, theApiKey.AccessID))
+	if err != nil {
+		c.Log.Errorf("failed to delete apikey in redis for id %v: %v", id, err)
+	}
+
+	err = theApiKey.Delete(c.Request.Context(), db.DB(), id)
 	if err != nil {
 		c.Log.Errorf("error newApiKey delete: %v", err)
 	}

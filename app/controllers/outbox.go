@@ -6,10 +6,10 @@ type Outbox struct {
 	App
 }
 
-func (c Outbox) All() revel.Result {
+func (c *Outbox) All() revel.Result {
 	return c.Render()
 }
 
-func (c Outbox) Get(id int64) revel.Result {
+func (c *Outbox) Get(id int64) revel.Result {
 	return c.Render()
 }

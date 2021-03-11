@@ -27,4 +27,13 @@ type (
 		SentAt     time.Time
 		StatusURL  string
 	}
+
+	DLRRequest struct {
+		ID     string
+		Status string
+		URL    string
+		Source string
+		Reason string
+		Phone  string
+	}
 )

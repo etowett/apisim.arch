@@ -16,6 +16,7 @@ import (
 	"apisim/app/entities"
 	"apisim/app/forms"
 	"apisim/app/helpers"
+	"apisim/app/jobs/sms_jobs"
 	"apisim/app/models"
 )
 
@@ -201,7 +202,7 @@ func (c *SMSApi) processMessage(
 	ctx context.Context,
 	smsRequest *entities.ProcessRequest,
 ) error {
-	// _, err := jobEnqueuer.Enqueue(ctx, sms_jobs.NewSendSMSJob(smsRequest))
-	// return err
+	_, err := jobEnqueuer.Enqueue(ctx, sms_jobs.NewSendSMSJob(smsRequest))
+	return err
 	return nil
 }

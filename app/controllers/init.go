@@ -2,12 +2,17 @@ package controllers
 
 import (
 	"apisim/app/db"
+	"apisim/app/jobs"
+	"apisim/app/jobs/job_handlers"
+	"apisim/app/work"
+	"context"
 	"time"
 
 	"github.com/revel/revel"
 )
 
 var (
+	jobEnqueuer  *work.AppJobEnqueuer
 	redisManager *db.AppRedis
 )
 
@@ -23,18 +28,26 @@ func initApp() {
 		MaxIdle:     100,
 	})
 
-	// redisPool := redisManager.RedisPool()
+	redisPool := redisManager.RedisPool()
 
-	// jobEnqueuer = work.NewJobEnqueuer(redisPool)
+	jobEnqueuer = work.NewJobEnqueuer(redisPool)
 
-	// workerPool := work.NewWorkerPool(redisPool, uint(200))
+	workerPool := work.NewWorkerPool(redisPool, uint(200))
 
-	// jobHandlers := setupJobHandlers(
-	// 	africasTalkingSender,
-	// 	jobEnqueuer,
-	// )
+	jobHandlers := setupJobHandlers(jobEnqueuer)
 
-	// workerPool.RegisterJobs(jobHandlers...)
+	workerPool.RegisterJobs(jobHandlers...)
 
-	// workerPool.Start(context.Background())
+	workerPool.Start(context.Background())
+}
+
+func setupJobHandlers(
+	jobEnqueuer work.JobEnqueuer,
+) []jobs.JobHandler {
+	processSMSJobHandler := job_handlers.NewProcessSMSJobHandler(jobEnqueuer)
+	processDlrJobHandler := job_handlers.NewProcessDlrJobHandler(jobEnqueuer)
+	return []jobs.JobHandler{
+		processDlrJobHandler,
+		processSMSJobHandler,
+	}
 }
