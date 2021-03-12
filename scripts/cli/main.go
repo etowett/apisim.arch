@@ -58,7 +58,7 @@ func main() {
 	fmt.Printf("Sending to %v recipients.\n\n", reqNum)
 
 	body := map[string]string{
-		"username": "apisim_cli",
+		"username": os.Getenv("APISIM_USER"),
 		"to":       recs,
 		"message":  smsBody,
 		"from":     "ApisimCli",
@@ -69,7 +69,7 @@ func main() {
 		Body:   body,
 		Method: "POST",
 		Headers: map[string]string{
-			"apikey": "27PRlie43wgNeZfKUV7CY8ul3FuwPn0yfsUXl7SW",
+			"apikey": os.Getenv("APISIM_SECRET"),
 		},
 	}
 	log.Printf("Request: %v\n", httpReq)

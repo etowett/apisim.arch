@@ -38,6 +38,13 @@ func init() {
 	// revel.OnAppStart(ExampleStartupScript)
 	revel.OnAppStart(initDB)
 	// revel.OnAppStart(FillCache)
+
+	revel.OnAppStop(func() {
+		if err := db.DB().Close(); err != nil {
+			revel.AppLog.Errorf("Failed to close the database: %v", err)
+		}
+	})
+
 }
 
 func initDB() {

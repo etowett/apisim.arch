@@ -5,8 +5,8 @@ import (
 	"apisim/app/entities"
 	"apisim/app/models"
 	"apisim/app/webutils"
+	"bytes"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/revel/revel"
@@ -16,7 +16,7 @@ type Outbox struct {
 	App
 }
 
-func (c *Outbox) All() revel.Result {
+func (c Outbox) All() revel.Result {
 	loggedInUser := c.connected()
 	var result entities.Response
 	paginationFilter, err := webutils.FilterFromQuery(c.Params)
@@ -60,7 +60,7 @@ func (c *Outbox) All() revel.Result {
 	return c.Render(result)
 }
 
-func (c *Outbox) Get(id int64) revel.Result {
+func (c Outbox) Get(id int64) revel.Result {
 	var result entities.Response
 	paginationFilter, err := webutils.FilterFromQuery(c.Params)
 	if err != nil {
@@ -115,8 +115,9 @@ func (c *Outbox) Get(id int64) revel.Result {
 	return c.Render(result)
 }
 
-func (c *Outbox) ExportAll() revel.Result {
-	// loggedInUser := c.connected()
+func (c Outbox) ExportAll() revel.Result {
+	loggedInUser := c.connected()
+	c.Log.Infof("loggedInUser: %v", loggedInUser)
 
 	newMessage := &models.Message{}
 	data, err := newMessage.AllForUser(c.Request.Context(), db.DB(), 1, &models.Filter{})
@@ -132,22 +133,32 @@ func (c *Outbox) ExportAll() revel.Result {
 		return nil
 	}
 
-	filename := fmt.Sprintf("my_messages_%s.csv", time.Now().Format("20060102150405"))
+	return c.RenderBinary(
+		bytes.NewReader(b),
+		fmt.Sprintf("my_messages_%s.csv", time.Now().Format("20060102150405")),
+		revel.Attachment,
+		time.Now(),
+	)
+}
 
-	c.Log.Infof("filename: %v", filename)
-	c.Log.Infof("data: %v", string(b))
-
-	c.Response.Out.Header().Add("Content-Type", "text/csv")
-	c.Response.Out.Header().Add("Content-Description", "File Transfer")
-	c.Response.Out.Header().Add("Content-Disposition", "attachment;filename="+filename)
-	c.Response.WriteHeader(http.StatusOK, "application/octet-stream")
-
-	c.Log.Infof("filename: %v", filename)
-	c.Log.Infof("data: %v", string(b))
-	code, err := c.Response.Out.Write(b)
+func (c Outbox) ExportRecipients(id int64) revel.Result {
+	newRec := &models.Recipient{}
+	data, err := newRec.ForMessage(c.Request.Context(), db.DB(), id, &models.Filter{})
 	if err != nil {
-		c.Log.Errorf("error writing content: %v", err)
+		c.Log.Errorf("could not get recipients for export %v: %v", id, err)
+		return nil
 	}
-	c.Log.Infof("code: %v", code)
-	return nil
+
+	b, err := csvCreator.CreateRecipentsCSV(data)
+	if err != nil {
+		c.Log.Errorf("Failed to create recipients csv when exporting: %v", err)
+		return nil
+	}
+
+	return c.RenderBinary(
+		bytes.NewReader(b),
+		fmt.Sprintf("message_recipients_%s.csv", time.Now().Format("20060102150405")),
+		revel.Attachment,
+		time.Now(),
+	)
 }

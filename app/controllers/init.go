@@ -31,15 +31,10 @@ func initApp() {
 	})
 
 	redisPool := redisManager.RedisPool()
-
 	jobEnqueuer = work.NewJobEnqueuer(redisPool)
-
 	workerPool := work.NewWorkerPool(redisPool, uint(200))
-
 	jobHandlers := setupJobHandlers(jobEnqueuer)
-
 	workerPool.RegisterJobs(jobHandlers...)
-
 	workerPool.Start(context.Background())
 }
 

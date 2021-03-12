@@ -28,6 +28,7 @@
   <div class="recipients">
   {{if .result.Data.Recipients}}
   {{ template "paginate.html" .result.Data.Pagination}}
+  <p><a href="{{url "Outbox.ExportRecipients" .result.Data.Message.ID}}" class="btn btn-primary">Export</a></p>
   <table class="table">
       <thead>
       <tr>
@@ -36,7 +37,6 @@
           <th>Status</th>
           <th>Reason</th>
           <th>Route</th>
-          <th>Cost</th>
       </tr>
       </thead>
       <tbody>
@@ -47,7 +47,6 @@
           <td>{{.Status.Value}}</td>
           <td>{{.Reason.Value}}</td>
           <td>{{.Route}}</td>
-          <td>{{.Currency}} {{.Cost}}</td>
       </tr>
       {{end}}
       </tbody>

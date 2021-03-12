@@ -27,12 +27,16 @@ GET         /user/:id                                   Users.Get
 
 GET         /messages                                   Outbox.All
 GET         /messages/export                            Outbox.ExportAll
+GET         /messages/export/:id                        Outbox.ExportRecipients
 GET         /messages/:id                               Outbox.Get
 
 # API Routes
 POST        /api/v1/user                                UsersAPI.Save
 
 POST        /api/v1/aft                                 SMSApi.SendToAT
+
+POST        /api/v1/cb/mpesa-topup                      BillingAPI.Mpesa
+GET         /api/v1/billing/user/:id                    BillingAPI.ForUser
 
 # Ignore favicon requests
 GET         /favicon.ico                                Static.Serve("public/img","favicon.png")

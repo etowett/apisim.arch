@@ -21,7 +21,7 @@ services:
     depends_on:
       - redis
     environment:
-      - REDIS_NAMESPACE=komsner
+      - REDIS_NAMESPACE=apisim
       - REDIS_HOST=redis://:MDNcVb924a@redis:6379
 
   postgres:

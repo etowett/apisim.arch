@@ -15,7 +15,7 @@ type Users struct {
 	App
 }
 
-func (c *Users) Register() revel.Result {
+func (c Users) Register() revel.Result {
 	return c.Render()
 }
 
@@ -25,7 +25,7 @@ func (c *Users) Save(user *forms.User) revel.Result {
 	if v.HasErrors() {
 		v.Keep()
 		c.FlashParams()
-		return c.Redirect(routes.Users.Register())
+		return c.Redirect(Users.Register)
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword(
@@ -35,7 +35,7 @@ func (c *Users) Save(user *forms.User) revel.Result {
 		c.Validation.Keep()
 		c.FlashParams()
 		c.Flash.Error("Could not generate password hash")
-		return c.Redirect(routes.Users.Register())
+		return c.Redirect(Users.Register)
 	}
 	newUser := models.User{
 		Username:     user.Username,
@@ -51,12 +51,12 @@ func (c *Users) Save(user *forms.User) revel.Result {
 		c.Validation.Keep()
 		c.FlashParams()
 		c.Flash.Error("Could not save user")
-		return c.Redirect(routes.Users.Register())
+		return c.Redirect(Users.Register)
 	}
 
 	c.Session["username"] = newUser.Username
 	c.Flash.Success("Welcome, " + newUser.FirstName)
-	return c.Redirect(routes.Outbox.All())
+	return c.Redirect(Outbox.All)
 }
 
 func (c Users) Login() revel.Result {
@@ -70,7 +70,7 @@ func (c *Users) DoLogin(login *forms.Login) revel.Result {
 	if v.HasErrors() {
 		v.Keep()
 		c.FlashParams()
-		return c.Redirect(routes.Users.Login())
+		return c.Redirect(Users.Login)
 	}
 
 	user := c.getUser(login.Username)
@@ -78,7 +78,7 @@ func (c *Users) DoLogin(login *forms.Login) revel.Result {
 		v.Keep()
 		c.Flash.Error("Could not find user with that username")
 		c.FlashParams()
-		return c.Redirect(routes.Users.Login())
+		return c.Redirect(Users.Login)
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(login.Password))
@@ -86,7 +86,7 @@ func (c *Users) DoLogin(login *forms.Login) revel.Result {
 		v.Keep()
 		c.Flash.Error("Invalid password provided")
 		c.FlashParams()
-		return c.Redirect(routes.Users.Login())
+		return c.Redirect(Users.Login)
 	}
 
 	c.Session["username"] = login.Username
@@ -99,7 +99,7 @@ func (c *Users) DoLogin(login *forms.Login) revel.Result {
 	return c.Redirect(routes.App.Dash())
 }
 
-func (c *Users) Logout() revel.Result {
+func (c Users) Logout() revel.Result {
 	for k := range c.Session {
 		delete(c.Session, k)
 	}
@@ -108,7 +108,7 @@ func (c *Users) Logout() revel.Result {
 
 func (c *Users) Get(id int64) revel.Result {
 	newUser := models.User{}
-	foundUser, err := newUser.GetByID(c.Request.Context(), db.DB(), id)
+	foundUser, err := newUser.ByID(c.Request.Context(), db.DB(), id)
 	if err != nil {
 		if err.Error() == "record not found" {
 			return c.Render(entities.Response{
@@ -123,8 +123,9 @@ func (c *Users) Get(id int64) revel.Result {
 		})
 	}
 
-	return c.Render(entities.Response{
+	result := entities.Response{
 		Success: true,
 		Data:    foundUser,
-	})
+	}
+	return c.Render(result)
 }

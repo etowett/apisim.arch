@@ -38,7 +38,7 @@ func (c *App) getUser(username string) *models.User {
 	}
 
 	newUser := &models.User{}
-	foundUser, err := newUser.GetByUsername(c.Request.Context(), db.DB(), username)
+	foundUser, err := newUser.ByUsername(c.Request.Context(), db.DB(), username)
 	if err != nil {
 		return nil
 	}

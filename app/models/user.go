@@ -30,7 +30,7 @@ type (
 // 	return fmt.Sprintf("User(%s)", u.Username)
 // }
 
-func (u *User) GetByID(
+func (u *User) ByID(
 	ctx context.Context,
 	db db.SQLOperations,
 	id int64,
@@ -42,7 +42,7 @@ func (u *User) GetByID(
 	return &user, err
 }
 
-func (u *User) GetByUsername(
+func (u *User) ByUsername(
 	ctx context.Context,
 	db db.SQLOperations,
 	username string,
