@@ -6,7 +6,6 @@ import (
 	"apisim/app/forms"
 	"apisim/app/helpers"
 	"apisim/app/models"
-	"apisim/app/routes"
 	"apisim/app/webutils"
 	"database/sql"
 
@@ -17,15 +16,15 @@ type Settings struct {
 	App
 }
 
-func (c *Settings) Index() revel.Result {
+func (c Settings) Index() revel.Result {
 	return c.Render()
 }
 
-func (c *Settings) ApiKeyAdd() revel.Result {
+func (c Settings) ApiKeyAdd() revel.Result {
 	return c.Render()
 }
 
-func (c *Settings) ApiKeySave(apiKey *forms.ApiKey) revel.Result {
+func (c Settings) ApiKeySave(apiKey *forms.ApiKey) revel.Result {
 	c.Log.Infof("apiKey: %+v", apiKey)
 	v := c.Validation
 	apiKey.Validate(v)
@@ -33,7 +32,7 @@ func (c *Settings) ApiKeySave(apiKey *forms.ApiKey) revel.Result {
 	if v.HasErrors() {
 		v.Keep()
 		c.FlashParams()
-		return c.Redirect(routes.Settings.ApiKeyAdd())
+		return c.Redirect(Settings.ApiKeyAdd)
 	}
 
 	theApiKey := &models.ApiKey{}
@@ -41,12 +40,12 @@ func (c *Settings) ApiKeySave(apiKey *forms.ApiKey) revel.Result {
 	if err != nil && err != sql.ErrNoRows {
 		c.Log.Errorf("Failed theApiKey.ByUserAndAccessID =[%v]", err)
 		c.Flash.Error("Internal server issue occured, please retry.")
-		return c.Redirect(routes.Settings.ApiKeyAdd())
+		return c.Redirect(Settings.ApiKeyAdd)
 	}
 
 	if existingApiKey.ID > 1 {
 		c.Flash.Error("You already have a key with name =[%v]", apiKey.Name)
-		return c.Redirect(routes.Settings.ApiKeyAdd())
+		return c.Redirect(Settings.ApiKeyAdd)
 	}
 
 	accessSecret := helpers.GenerateApiKeySecret()
@@ -54,7 +53,7 @@ func (c *Settings) ApiKeySave(apiKey *forms.ApiKey) revel.Result {
 	if err != nil {
 		c.Log.Errorf("Failed to hash api key secret for user=[%v]", apiKey.UserID)
 		c.Flash.Error("Could not get secret, internal server issue.")
-		return c.Redirect(routes.Settings.ApiKeyAdd())
+		return c.Redirect(Settings.ApiKeyAdd)
 	}
 
 	newApiKey := &models.ApiKey{
@@ -71,7 +70,7 @@ func (c *Settings) ApiKeySave(apiKey *forms.ApiKey) revel.Result {
 		c.Validation.Keep()
 		c.Flash.Error("Could not save, internal server issue.")
 		c.FlashParams()
-		return c.Redirect(routes.Settings.ApiKeyAdd())
+		return c.Redirect(Settings.ApiKeyAdd)
 	}
 
 	cachedApiKey := &entities.CachedApiKey{
@@ -86,10 +85,10 @@ func (c *Settings) ApiKeySave(apiKey *forms.ApiKey) revel.Result {
 
 	c.Flash.Success("ApiKey created - " + newApiKey.Name)
 	c.Session["api-key-secret"] = accessSecret
-	return c.Redirect(routes.Settings.ApiKeyDetails(newApiKey.ID))
+	return c.Redirect(Settings.ApiKeyDetails, newApiKey.ID)
 }
 
-func (c *Settings) ApiKeys() revel.Result {
+func (c Settings) ApiKeys() revel.Result {
 	var result entities.Response
 	paginationFilter, err := webutils.FilterFromQuery(c.Params)
 	if err != nil {
@@ -132,7 +131,7 @@ func (c *Settings) ApiKeys() revel.Result {
 	return c.Render(result)
 }
 
-func (c *Settings) ApiKeyDetails(id int64) revel.Result {
+func (c Settings) ApiKeyDetails(id int64) revel.Result {
 	var result entities.Response
 	var theSecret string
 	newApiKey := &models.ApiKey{}
@@ -161,7 +160,7 @@ func (c *Settings) ApiKeyDetails(id int64) revel.Result {
 	return c.Render(result)
 }
 
-func (c *Settings) DeleteApiKey(id int64) revel.Result {
+func (c Settings) DeleteApiKey(id int64) revel.Result {
 	newApiKey := &models.ApiKey{}
 	theApiKey, err := newApiKey.ByID(c.Request.Context(), db.DB(), id)
 	if err != nil {
@@ -178,5 +177,5 @@ func (c *Settings) DeleteApiKey(id int64) revel.Result {
 		c.Log.Errorf("error newApiKey delete: %v", err)
 	}
 
-	return c.Redirect(routes.Settings.ApiKeys())
+	return c.Redirect(Settings.ApiKeys)
 }

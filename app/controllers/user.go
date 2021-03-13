@@ -5,7 +5,6 @@ import (
 	"apisim/app/entities"
 	"apisim/app/forms"
 	"apisim/app/models"
-	"apisim/app/routes"
 
 	"github.com/revel/revel"
 	"golang.org/x/crypto/bcrypt"
@@ -19,7 +18,7 @@ func (c Users) Register() revel.Result {
 	return c.Render()
 }
 
-func (c *Users) Save(user *forms.User) revel.Result {
+func (c Users) Save(user *forms.User) revel.Result {
 	v := c.Validation
 	user.Validate(v)
 	if v.HasErrors() {
@@ -63,7 +62,7 @@ func (c Users) Login() revel.Result {
 	return c.Render()
 }
 
-func (c *Users) DoLogin(login *forms.Login) revel.Result {
+func (c Users) DoLogin(login *forms.Login) revel.Result {
 	v := c.Validation
 	login.Validate(v)
 
@@ -96,17 +95,17 @@ func (c *Users) DoLogin(login *forms.Login) revel.Result {
 		c.Session.SetDefaultExpiration()
 	}
 	c.Flash.Success("Welcome " + login.Username)
-	return c.Redirect(routes.App.Dash())
+	return c.Redirect(App.Dash)
 }
 
 func (c Users) Logout() revel.Result {
 	for k := range c.Session {
 		delete(c.Session, k)
 	}
-	return c.Redirect(routes.App.Index())
+	return c.Redirect(App.Index)
 }
 
-func (c *Users) Get(id int64) revel.Result {
+func (c Users) Get(id int64) revel.Result {
 	newUser := models.User{}
 	foundUser, err := newUser.ByID(c.Request.Context(), db.DB(), id)
 	if err != nil {

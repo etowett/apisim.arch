@@ -11,6 +11,7 @@ services:
       - .:/apisim
     environment:
       - ENV=dev
+      - PORT=4027
       - DB_URL=postgres://apisim:apisim@postgres/apisim?sslmode=disable
       - REDIS_URL=redis://:MDNcVb924a@redis:6379
 
