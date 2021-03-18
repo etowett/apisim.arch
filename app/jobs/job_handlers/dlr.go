@@ -63,6 +63,7 @@ func (h *ProcessDlrJobHandler) PerformJob(
 		revel.AppLog.Errorf("error unmarshal send dlr task: %v", err)
 		return nil
 	}
+
 	req := theJob.Request
 	if req.Source != "sf" {
 		var body map[string]string

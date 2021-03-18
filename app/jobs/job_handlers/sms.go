@@ -45,17 +45,16 @@ func (h *ProcessSMSJobHandler) PerformJob(
 		return nil
 	}
 
-	revel.AppLog.Infof("process send sms task: =[%+v]", theJob)
-
 	req := theJob.Request
 	message := models.Message{
-		UserID:   req.UserID,
-		SenderID: req.SenderID,
-		Meta:     req.Message,
-		Message:  req.Message,
-		Cost:     req.Cost,
-		Currency: req.Currency,
-		SentAt:   req.SentAt,
+		UserID:         req.UserID,
+		SenderID:       req.SenderID,
+		Meta:           req.Message,
+		Message:        req.Message,
+		Cost:           req.Cost,
+		Currency:       req.Currency,
+		SentAt:         req.SentAt,
+		RecipientCount: len(req.Recipients),
 	}
 
 	err = message.Save(ctx, db.DB())
@@ -118,7 +117,7 @@ func (h *ProcessSMSJobHandler) PerformJob(
 					URL:    req.StatusURL,
 				}
 
-				err := h.processDlr(ctx, dlrReq)
+				err = h.processDlr(ctx, dlrReq)
 				if err != nil {
 					return fmt.Errorf("could not queue dlr task: %v", err)
 				}
@@ -134,10 +133,12 @@ func (h *ProcessSMSJobHandler) processDlr(
 ) error {
 	rand.Seed(time.Now().UnixNano())
 
+	theTime := time.Second * time.Duration(rand.Intn(300))
+
 	_, err := h.jobEnqueuer.EnqueueIn(
 		ctx,
 		sms_jobs.NewProcessDlrJob(dlrReq),
-		time.Second*time.Duration(rand.Intn(600)),
+		theTime,
 	)
 	if err != nil {
 		return fmt.Errorf("could not queue dlr: %v", err)

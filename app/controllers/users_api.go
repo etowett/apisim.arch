@@ -76,6 +76,6 @@ func (c *UsersAPI) Save() revel.Result {
 	return c.RenderJSON(entities.Response{
 		Data:    newUser,
 		Status:  status,
-		Success: false,
+		Success: true,
 	})
 }

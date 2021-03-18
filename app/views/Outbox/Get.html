@@ -35,7 +35,6 @@
           <th>Phone</th>
           <th>Cost</th>
           <th>Status</th>
-          <th>Reason</th>
           <th>Route</th>
       </tr>
       </thead>
@@ -45,7 +44,6 @@
           <td>{{.Phone}}</td>
           <td>{{.Currency}} {{.Cost}}</td>
           <td>{{.Status.Value}}</td>
-          <td>{{if .Reason.Valid}} {{.Reason.Value}} {{else}}-{{end}}</td>
           <td>{{.Route}}</td>
       </tr>
       {{end}}

@@ -61,6 +61,7 @@ func (c SMSApi) validateApiKey(
 
 			cachedApiKey.UserID = apiKey.UserID
 			cachedApiKey.AccountSecretHash = apiKey.AccessSecretHash
+			cachedApiKey.DlrURL = apiKey.DlrURL
 		} else {
 			return cachedApiKey, fmt.Errorf("Failed to retrieve api key from cache")
 		}
@@ -181,6 +182,9 @@ func (c SMSApi) SendToAT() revel.Result {
 		SenderID:   smsRequest.SenderID,
 		Message:    smsRequest.Message,
 		SentAt:     time.Now(),
+		StatusURL:  validKey.DlrURL,
+		Route:      "at",
+		Cost:       totalCost,
 	})
 	if err != nil {
 		c.Log.Errorf("could not queue at message for process: %v", err)

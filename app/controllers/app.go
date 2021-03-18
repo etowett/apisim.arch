@@ -83,6 +83,18 @@ func (c App) cacheApiKey(
 	return nil
 }
 
+func (c App) clearCachedApiKey(
+	net string,
+	accountID string,
+) error {
+
+	if _, err := redisManager.Del(c.generateCacheKey(net, accountID)); err != nil {
+		return fmt.Errorf("Failed to clear cached api key for accountid=[%v]: %v", accountID, err)
+	}
+
+	return nil
+}
+
 func (c App) generateCacheKey(net, accountID string) string {
 	return "apisim:" + net + ":apikey:" + accountID
 }

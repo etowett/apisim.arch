@@ -122,6 +122,11 @@ func (c Settings) ApiKeySaveDlr(id int64, form *forms.ApiKeyDlr) revel.Result {
 		return c.Redirect(Settings.ApiKeyDetails, id)
 	}
 
+	err = c.clearCachedApiKey(apiKey.Provider, apiKey.AccessID)
+	if err != nil {
+		c.Log.Errorf("Failed to clearCachedApiKey: %v", err)
+	}
+
 	return c.Redirect(Settings.ApiKeyDetails, id)
 }
 
@@ -238,6 +243,11 @@ func (c Settings) DeleteApiUrl(id int64) revel.Result {
 		c.Flash.Error("Could not delete, internal server issue.")
 		c.FlashParams()
 		return c.Redirect(Settings.ApiKeyDetails, id)
+	}
+
+	err = c.clearCachedApiKey(apiKey.Provider, apiKey.AccessID)
+	if err != nil {
+		c.Log.Errorf("Failed to clearCachedApiKey: %v", err)
 	}
 
 	return c.Redirect(Settings.ApiKeyDetails, id)
