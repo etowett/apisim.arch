@@ -18,6 +18,7 @@ const (
 	getApiKeyUserAndAccessIDSQL = selectApiKeySQL + " where access_id=$1 and user_id=$2"
 	countApiKeySQL              = `select count(id) from api_keys`
 	deleteApiKeySQL             = `delete from api_keys where id=$1`
+	updateApiKeySQL             = `update api_keys set (name, dlr_url, updated_at) = ($1, $2, $3) where id=$4`
 )
 
 type (
@@ -151,17 +152,29 @@ func (a *ApiKey) Save(
 	db db.SQLOperations,
 ) error {
 	a.Timestamps.Touch()
-	err := db.QueryRowContext(
+	var err error
+	if a.IsNew() {
+		err = db.QueryRowContext(
+			ctx,
+			createApiKeySQL,
+			a.UserID,
+			a.Provider,
+			a.Name,
+			a.AccessID,
+			a.AccessSecretHash,
+			a.DlrURL,
+			a.Timestamps.CreatedAt,
+		).Scan(&a.ID)
+		return err
+	}
+	_, err = db.ExecContext(
 		ctx,
-		createApiKeySQL,
-		a.UserID,
-		a.Provider,
+		updateApiKeySQL,
 		a.Name,
-		a.AccessID,
-		a.AccessSecretHash,
 		a.DlrURL,
-		a.Timestamps.CreatedAt,
-	).Scan(&a.ID)
+		a.Timestamps.UpdatedAt,
+		a.ID,
+	)
 	return err
 }
 

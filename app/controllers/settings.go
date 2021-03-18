@@ -8,8 +8,10 @@ import (
 	"apisim/app/models"
 	"apisim/app/webutils"
 	"database/sql"
+	"time"
 
 	"github.com/revel/revel"
+	null "gopkg.in/guregu/null.v4"
 )
 
 type Settings struct {
@@ -25,7 +27,6 @@ func (c Settings) ApiKeyAdd() revel.Result {
 }
 
 func (c Settings) ApiKeySave(apiKey *forms.ApiKey) revel.Result {
-	c.Log.Infof("apiKey: %+v", apiKey)
 	v := c.Validation
 	apiKey.Validate(v)
 
@@ -76,6 +77,7 @@ func (c Settings) ApiKeySave(apiKey *forms.ApiKey) revel.Result {
 	cachedApiKey := &entities.CachedApiKey{
 		UserID:            apiKey.UserID,
 		AccountSecretHash: accessSecretHash,
+		DlrURL:            apiKey.DlrURL,
 	}
 
 	err = c.cacheApiKey(apiKey.Provider, apiKey.Username, cachedApiKey)
@@ -86,6 +88,41 @@ func (c Settings) ApiKeySave(apiKey *forms.ApiKey) revel.Result {
 	c.Flash.Success("ApiKey created - " + newApiKey.Name)
 	c.Session["api-key-secret"] = accessSecret
 	return c.Redirect(Settings.ApiKeyDetails, newApiKey.ID)
+}
+
+func (c Settings) ApiKeySaveDlr(id int64, form *forms.ApiKeyDlr) revel.Result {
+	v := c.Validation
+	form.Validate(v)
+
+	if v.HasErrors() {
+		v.Keep()
+		c.FlashParams()
+		return c.Redirect(Settings.ApiKeyDetails, id)
+	}
+
+	newApiKey := &models.ApiKey{}
+	apiKey, err := newApiKey.ByID(c.Request.Context(), db.DB(), id)
+	if err != nil {
+		c.Log.Errorf("Could not get apiKey by id %v: %v", id, err)
+		c.Validation.Keep()
+		c.Flash.Error("Could not save, internal server issue.")
+		c.FlashParams()
+		return c.Redirect(Settings.ApiKeyDetails, id)
+	}
+
+	apiKey.DlrURL = form.DlrURL
+	apiKey.UpdatedAt = null.TimeFrom(time.Now())
+
+	err = apiKey.Save(c.Request.Context(), db.DB())
+	if err != nil {
+		c.Log.Errorf("Failed to save when updating apiKey: %v", err)
+		c.Validation.Keep()
+		c.Flash.Error("Could not save, internal server issue.")
+		c.FlashParams()
+		return c.Redirect(Settings.ApiKeyDetails, id)
+	}
+
+	return c.Redirect(Settings.ApiKeyDetails, id)
 }
 
 func (c Settings) ApiKeys() revel.Result {
@@ -178,4 +215,30 @@ func (c Settings) DeleteApiKey(id int64) revel.Result {
 	}
 
 	return c.Redirect(Settings.ApiKeys)
+}
+
+func (c Settings) DeleteApiUrl(id int64) revel.Result {
+	newApiKey := &models.ApiKey{}
+	apiKey, err := newApiKey.ByID(c.Request.Context(), db.DB(), id)
+	if err != nil {
+		c.Log.Errorf("Failed to get for delete apiKey %v: %v", id, err)
+		c.Validation.Keep()
+		c.Flash.Error("Could not delete, internal server issue.")
+		c.FlashParams()
+		return c.Redirect(Settings.ApiKeyDetails, id)
+	}
+
+	apiKey.DlrURL = ""
+	apiKey.UpdatedAt = null.TimeFrom(time.Now())
+
+	err = apiKey.Save(c.Request.Context(), db.DB())
+	if err != nil {
+		c.Log.Errorf("Failed to save when updating apiKey dlr: %v", err)
+		c.Validation.Keep()
+		c.Flash.Error("Could not delete, internal server issue.")
+		c.FlashParams()
+		return c.Redirect(Settings.ApiKeyDetails, id)
+	}
+
+	return c.Redirect(Settings.ApiKeyDetails, id)
 }
