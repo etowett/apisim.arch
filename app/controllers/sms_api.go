@@ -24,19 +24,18 @@ type SMSApi struct {
 	App
 }
 
-func (c *SMSApi) inBlacklist(phoneNumber string) bool {
-	// To check from db if inBlacklist
+func (c SMSApi) inBlacklist(phoneNumber string) bool {
 	return false
 }
 
-func (s *SMSApi) getMesageCost(
+func (c SMSApi) getMesageCost(
 	message string,
 	number string,
 ) float64 {
 	return 1.0 * math.Ceil(float64(len(message))/160)
 }
 
-func (c *SMSApi) validateApiKey(
+func (c SMSApi) validateApiKey(
 	ctx context.Context,
 	net string,
 	accountID string,
@@ -62,6 +61,7 @@ func (c *SMSApi) validateApiKey(
 
 			cachedApiKey.UserID = apiKey.UserID
 			cachedApiKey.AccountSecretHash = apiKey.AccessSecretHash
+			cachedApiKey.DlrURL = apiKey.DlrURL
 		} else {
 			return cachedApiKey, fmt.Errorf("Failed to retrieve api key from cache")
 		}
@@ -86,7 +86,7 @@ func (c *SMSApi) validateApiKey(
 	return cachedApiKey, nil
 }
 
-func (c *SMSApi) SendToAT() revel.Result {
+func (c SMSApi) SendToAT() revel.Result {
 
 	smsRequest := &forms.ATForm{
 		Username: c.Params.Get("username"),
@@ -182,6 +182,9 @@ func (c *SMSApi) SendToAT() revel.Result {
 		SenderID:   smsRequest.SenderID,
 		Message:    smsRequest.Message,
 		SentAt:     time.Now(),
+		StatusURL:  validKey.DlrURL,
+		Route:      "at",
+		Cost:       totalCost,
 	})
 	if err != nil {
 		c.Log.Errorf("could not queue at message for process: %v", err)
@@ -198,11 +201,10 @@ func (c *SMSApi) SendToAT() revel.Result {
 	})
 }
 
-func (c *SMSApi) processMessage(
+func (c SMSApi) processMessage(
 	ctx context.Context,
 	smsRequest *entities.ProcessRequest,
 ) error {
 	_, err := jobEnqueuer.Enqueue(ctx, sms_jobs.NewSendSMSJob(smsRequest))
 	return err
-	return nil
 }

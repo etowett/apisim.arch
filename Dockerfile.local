@@ -1,4 +1,4 @@
-FROM golang:1.16.0-alpine AS build
+FROM golang:1.16.2-alpine AS build
 
 # Add required packages
 RUN apk add --update git curl bash
@@ -7,10 +7,14 @@ RUN apk add --update git curl bash
 RUN go get -u github.com/revel/revel
 RUN go get -u github.com/revel/cmd/revel
 
-WORKDIR /apisim
-ADD . .
-ENV CGO_ENABLED 0
+WORKDIR /app
+
+COPY go.mod go.sum ./
 RUN go mod download
+
+ENV CGO_ENABLED 0
+
+ADD . .
 
 # Run revel app
 ENTRYPOINT revel run

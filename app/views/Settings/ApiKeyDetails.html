@@ -3,6 +3,8 @@
 
   <h1>ApiKey Details</h1>
 
+
+
   {{if not .result.Success}}
   <div class="alert alert-danger alert-dismissible fade show">
     <strong>Failed!</strong> {{.result.Message}}
@@ -12,23 +14,47 @@
 
   <div class="api-key">
     {{if .result.Data.ApiKey}}
-      {{with .result.Data.ApiKey}}
-        <p>
-          <small>Created on <i>{{.CreatedAt}}</i></small>
-        </p>
-        <p>
-          Provider: {{.Provider}} <br />
-          Name: {{.Name}} <br />
-          AccessID: {{.AccessID}} <br />
-          {{if $.result.Data.Secret}}
-            <span class="text-danger">Please note that this secret is only shown once. Keep it safe</span><br />
-            Access Secret: {{$.result.Data.Secret}}<br />
-          {{end}}
-        </p>
-        <p>
-            <a href="{{url "Settings.DeleteApiKey" .ID}}" onclick="return confirm('Are you sure?')">Delete</a>
-        </p>
-      {{end}}
+      {{$apiKey := .result.Data.ApiKey}}
+      <div>
+        <small>
+          Created on <i>{{$apiKey.CreatedAt}}</i> |
+          <a href="{{url "Settings.DeleteApiKey" $apiKey.ID}}" onclick="return confirm('Are you sure?')">Delete</a>
+        </small>
+      </div>
+      <div>
+        Provider: {{$apiKey.Provider}} <br />
+        Name: {{$apiKey.Name}} <br />
+        AccessID: {{$apiKey.AccessID}} <br />
+        {{if $.result.Data.Secret}}
+          <span class="text-danger">Please note that this secret is only shown once. Keep it safe</span><br />
+          Access Secret: {{$.result.Data.Secret}}<br />
+        {{end}}
+        {{if $apiKey.DlrURL}}
+          DlrUrl: {{$apiKey.DlrURL}}
+          <a href="{{url "Settings.DeleteApiUrl" $apiKey.ID}}">Delete</a>
+          <br />
+        {{else}}
+        <h4>Add dlr-url</h4>
+        <form action="{{url "Settings.ApiKeySaveDlr" $apiKey.ID}}" id="apiKey-add" method="POST" class="form-horizontal" role="form">
+
+          {{with $field := field "form.DlrURL" .}}
+          <div class="form-group row {{if $field.Error}}has-error{{end}}">
+            <label class="col-sm-2 col-form-label" for="{{$field.Name}}">DlrURL</label>
+            <div class="col-sm-10">
+              <input type="text" id="{{$field.Name}}" name="{{$field.Name}}" class="form-control" placeholder="Callback Url" value="{{$field.Flash}}" />
+              <span class="help-block text-danger">{{$field.Error}}</span>
+            </div>
+          </div>
+          {{ end }}
+
+          <div class="form-group row">
+            <div class="col-sm-10">
+              <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+          </div>
+        </form>
+        {{end}}
+      </div>
     {{end}}
   </div>
 

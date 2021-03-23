@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	createDlrSQL = `insert into dlrs (recipient_id, status, reason, received_at, created_at) VALUES ($1, $2, $3, $4, $5) returning id`
+	createDlrSQL = `insert into dlrs (recipient_id, status, received_at, created_at) VALUES ($1, $2, $3, $4) returning id`
 )
 
 type (
@@ -15,7 +15,6 @@ type (
 		SequentialIdentifier
 		RecipientID int64     `json:"recipient_id"`
 		Status      string    `json:"status"`
-		Reason      string    `json:"reason"`
 		ReceivedAt  time.Time `json:"received_at"`
 		Timestamps
 	}
@@ -31,7 +30,6 @@ func (d *Dlr) Save(
 		createDlrSQL,
 		d.RecipientID,
 		d.Status,
-		d.Reason,
 		d.ReceivedAt,
 		d.Timestamps.CreatedAt,
 	).Scan(&d.ID)

@@ -12,7 +12,7 @@ import (
 
 const (
 	createRecipientSQL         = `insert into recipients (message_id, phone, api_id, route, cost, currency, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) returning id`
-	selectRecipientSQL         = `select r.id, r.message_id, r.phone, d.status, d.reason, r.api_id, r.route, r.cost, r.currency, r.created_at from recipients r left join dlrs d on r.id = d.recipient_id`
+	selectRecipientSQL         = `select r.id, r.message_id, r.phone, d.status, r.api_id, r.route, r.cost, r.currency, r.created_at from recipients r left join dlrs d on r.id = d.recipient_id`
 	selectMessageRecipientsSQL = selectRecipientSQL + ` where message_id=$1`
 	countRecipientSQL          = `select count(r.id) from recipients r`
 )
@@ -23,7 +23,6 @@ type (
 		MessageID  int64       `json:"message_id"`
 		Phone      string      `json:"phone"`
 		Status     null.String `json:"status"`
-		Reason     null.String `json:"reason"`
 		Route      string      `json:"route"`
 		Cost       string      `json:"cost"`
 		Currency   string      `json:"currency"`
@@ -80,7 +79,6 @@ func (r *Recipient) ForMessage(
 			&recipient.MessageID,
 			&recipient.Phone,
 			&recipient.Status,
-			&recipient.Reason,
 			&recipient.Correlator,
 			&recipient.Route,
 			&recipient.Cost,

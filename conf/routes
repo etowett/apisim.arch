@@ -17,6 +17,8 @@ GET         /settings/api-keys/new                      Settings.ApiKeyAdd
 POST        /settings/api-keys/new                      Settings.ApiKeySave
 GET         /settings/api-keys/:id                      Settings.ApiKeyDetails
 GET         /settings/api-keys/delete/:id               Settings.DeleteApiKey
+POST        /settings/api-keys/dlr/:id                  Settings.ApiKeySaveDlr
+GET         /settings/api-keys/delete-dlr/:id           Settings.DeleteApiUrl
 
 GET         /register                                   Users.Register
 POST        /register                                   Users.Save

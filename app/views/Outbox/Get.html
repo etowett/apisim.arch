@@ -29,13 +29,12 @@
   {{if .result.Data.Recipients}}
   {{ template "paginate.html" .result.Data.Pagination}}
   <p><a href="{{url "Outbox.ExportRecipients" .result.Data.Message.ID}}" class="btn btn-primary">Export</a></p>
-  <table class="table">
-      <thead>
+  <table class="table table-striped table-bordered hover">
+    <thead>
       <tr>
           <th>Phone</th>
           <th>Cost</th>
           <th>Status</th>
-          <th>Reason</th>
           <th>Route</th>
       </tr>
       </thead>
@@ -45,7 +44,6 @@
           <td>{{.Phone}}</td>
           <td>{{.Currency}} {{.Cost}}</td>
           <td>{{.Status.Value}}</td>
-          <td>{{.Reason.Value}}</td>
           <td>{{.Route}}</td>
       </tr>
       {{end}}

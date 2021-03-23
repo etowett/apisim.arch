@@ -9,6 +9,7 @@ create table messages (
   sender_id varchar(20) not null,
   meta varchar(999) not null,
   message varchar(999) not null,
+  recipient_count integer not null,
   cost numeric(16,4) not null,
   currency varchar(20) not null,
   sent_at timestamptz not null,

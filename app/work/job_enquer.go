@@ -5,38 +5,45 @@ import (
 	"context"
 	"time"
 
-	"github.com/gocraft/work"
+	gowork "github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
 	"github.com/revel/revel"
 )
 
 const (
-	workerNamespace = "apisim"
+	workerNamespace = "apisim_jobs"
 	contextKey      = "_context"
 	requestIDKey    = "request_id"
 	bodyKey         = "body"
 )
 
 type JobEnqueuer interface {
-	Enqueue(ctx context.Context, job jobs.Job) (string, error)
-	EnqueueIn(ctx context.Context, job jobs.Job, duration time.Duration) (string, error)
+	Enqueue(context.Context, jobs.Job) (string, error)
+	EnqueueIn(context.Context, jobs.Job, time.Duration) (string, error)
 }
 
 type AppJobEnqueuer struct {
-	enqueuer *work.Enqueuer
+	enqueuer *gowork.Enqueuer
 }
 
 func NewJobEnqueuer(pool *redis.Pool) *AppJobEnqueuer {
 	return &AppJobEnqueuer{
-		enqueuer: work.NewEnqueuer(workerNamespace, pool),
+		enqueuer: gowork.NewEnqueuer(workerNamespace, pool),
 	}
 }
 
-func (e *AppJobEnqueuer) Enqueue(ctx context.Context, job jobs.Job) (string, error) {
+func (e *AppJobEnqueuer) Enqueue(
+	ctx context.Context,
+	job jobs.Job,
+) (string, error) {
 	return e.enqueue(ctx, job, 0)
 }
 
-func (e *AppJobEnqueuer) EnqueueIn(ctx context.Context, job jobs.Job, duration time.Duration) (string, error) {
+func (e *AppJobEnqueuer) EnqueueIn(
+	ctx context.Context,
+	job jobs.Job,
+	duration time.Duration,
+) (string, error) {
 	return e.enqueue(ctx, job, duration)
 }
 
@@ -56,11 +63,11 @@ func (e *AppJobEnqueuer) enqueue(
 	args[contextKey] = contextArgs
 	args[bodyKey] = b
 
-	var internalJob *work.Job
+	var internalJob *gowork.Job
 	if duration > 0 {
-		var scheduledJob *work.ScheduledJob
+		var scheduledJob *gowork.ScheduledJob
 		scheduledJob, err = e.enqueuer.EnqueueIn(job.JobName(), int64(duration.Seconds()), args)
-		if err != nil {
+		if err == nil {
 			internalJob = scheduledJob.Job
 		}
 	} else {

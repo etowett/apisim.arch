@@ -1,17 +1,21 @@
 #Compile stage
-FROM golang:1.16.0-alpine AS build
+FROM golang:1.16.2-alpine AS build
 
 # Add required packages
 RUN apk add  --no-cache --update git curl bash
 
-WORKDIR /app
-ADD . .
-ENV CGO_ENABLED 0
-ENV GOOS=linux
-ENV GOARCH=amd64
 RUN go get -u github.com/revel/revel
 RUN go get -u github.com/revel/cmd/revel
+
+WORKDIR /app
+COPY go.mod go.sum ./
 RUN go mod download
+
+ENV CGO_ENABLED 0 \
+    GOOS=linux \
+    GOARCH=amd64
+
+ADD . .
 
 RUN revel build apisim apisim dev
 

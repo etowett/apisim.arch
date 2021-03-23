@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	createMessageSQL  = `insert into messages (user_id, sender_id, meta, message, cost, currency, sent_at, created_at) values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`
-	selectMessageSQL  = `select id, user_id, sender_id, meta, message, cost, currency, sent_at, created_at from messages`
+	createMessageSQL  = `insert into messages (user_id, sender_id, meta, message, recipient_count, cost, currency, sent_at, created_at) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id`
+	selectMessageSQL  = `select id, user_id, sender_id, meta, message, recipient_count, cost, currency, sent_at, created_at from messages`
 	getMessageByIDSQL = selectMessageSQL + ` where id=$1`
 	countMessageSQL   = `select count(id) from messages`
 )
@@ -64,6 +64,7 @@ func (m *Message) AllForUser(
 			&message.SenderID,
 			&message.Meta,
 			&message.Message,
+			&message.RecipientCount,
 			&message.Cost,
 			&message.Currency,
 			&message.SentAt,
@@ -120,6 +121,7 @@ func (m *Message) Save(
 		m.SenderID,
 		m.Meta,
 		m.Message,
+		m.RecipientCount,
 		m.Cost,
 		m.Currency,
 		m.SentAt,
@@ -138,6 +140,7 @@ func (*Message) scan(
 		&message.SenderID,
 		&message.Meta,
 		&message.Message,
+		&message.RecipientCount,
 		&message.Cost,
 		&message.Currency,
 		&message.SentAt,

@@ -19,8 +19,10 @@ stop:
 rm: stop
 	@docker-compose rm
 
-cli:
-	go build -o /tmp/apisim-cli ./scripts/cli/main.go
+build_cli:
+	@echo "Building cli to /tmp/apisim-cli"
+	@go build -o /tmp/apisim-cli ./scripts/cli/main.go
+	@echo "Done!"
 
 # make migration name=create_users
 migration:

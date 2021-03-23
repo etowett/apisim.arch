@@ -15,22 +15,22 @@ type App struct {
 	*revel.Controller
 }
 
-func (c *App) Index() revel.Result {
+func (c App) Index() revel.Result {
 	return c.Render()
 }
 
-func (c *App) Dash() revel.Result {
+func (c App) Dash() revel.Result {
 	return c.Render()
 }
 
-func (c *App) Health() revel.Result {
+func (c App) Health() revel.Result {
 	return c.RenderJSON(map[string]interface{}{
 		"success":     true,
 		"status":      "Ok",
 		"server_time": time.Now(),
 	})
 }
-func (c *App) getUser(username string) *models.User {
+func (c App) getUser(username string) *models.User {
 	user := &models.User{}
 	_, err := c.Session.GetInto("user", user, false)
 	if user.Username == username {
@@ -47,7 +47,7 @@ func (c *App) getUser(username string) *models.User {
 	return foundUser
 }
 
-func (c *App) connected() *models.User {
+func (c App) connected() *models.User {
 	if c.ViewArgs["user"] != nil {
 		return c.ViewArgs["user"].(*models.User)
 	}
@@ -57,14 +57,14 @@ func (c *App) connected() *models.User {
 	return nil
 }
 
-func (c *App) AddUser() revel.Result {
+func (c App) AddUser() revel.Result {
 	if user := c.connected(); user != nil {
 		c.ViewArgs["user"] = user
 	}
 	return nil
 }
 
-func (c *App) cacheApiKey(
+func (c App) cacheApiKey(
 	net string,
 	accountID string,
 	cachedApiKey *entities.CachedApiKey,
@@ -83,6 +83,18 @@ func (c *App) cacheApiKey(
 	return nil
 }
 
-func (c *App) generateCacheKey(net, accountID string) string {
+func (c App) clearCachedApiKey(
+	net string,
+	accountID string,
+) error {
+
+	if _, err := redisManager.Del(c.generateCacheKey(net, accountID)); err != nil {
+		return fmt.Errorf("Failed to clear cached api key for accountid=[%v]: %v", accountID, err)
+	}
+
+	return nil
+}
+
+func (c App) generateCacheKey(net, accountID string) string {
 	return "apisim:" + net + ":apikey:" + accountID
 }

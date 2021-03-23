@@ -55,7 +55,7 @@ func main() {
 		apiURL = envURL
 	}
 
-	fmt.Printf("Sending to %v recipients.\n\n", reqNum)
+	log.Printf("Sending to %v recipients.", reqNum)
 
 	body := map[string]string{
 		"username": os.Getenv("APISIM_USER"),

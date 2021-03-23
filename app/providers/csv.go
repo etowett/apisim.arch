@@ -61,14 +61,13 @@ func (s *SimpleCSVCreator) CreateRecipentsCSV(
 
 	records := make([][]string, len(recipients)+1)
 
-	records[0] = []string{"PHONE", "COST", "STATUS", "REASON", "ROUTE"}
+	records[0] = []string{"PHONE", "COST", "STATUS", "ROUTE"}
 
 	for index, recipient := range recipients {
 		records[index+1] = []string{
 			recipient.Phone,
 			fmt.Sprintf("%v %v", recipient.Currency, recipient.Cost),
 			recipient.Status.ValueOrZero(),
-			recipient.Reason.ValueOrZero(),
 			recipient.CreatedAt.Format(layout),
 		}
 	}
