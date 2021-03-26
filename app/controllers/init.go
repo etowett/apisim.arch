@@ -7,9 +7,11 @@ import (
 	"apisim/app/providers"
 	"apisim/app/work"
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/revel/revel"
+	"golang.org/x/text/message"
 )
 
 var (
@@ -21,6 +23,21 @@ var (
 func init() {
 	revel.OnAppStart(initApp)
 	revel.InterceptMethod((*App).AddUser, revel.BEFORE)
+
+	revel.TemplateFuncs["formatDate"] = func(theTime time.Time) string {
+		timeLocation, err := time.LoadLocation("Africa/Nairobi")
+		if err != nil {
+			revel.AppLog.Errorf("failed to load Nairobi timezone: %+v", err)
+			return theTime.Format("Jan _2 2006 3:04PM")
+		}
+
+		return theTime.In(timeLocation).Format("Jan _2 2006 3:04PM")
+	}
+
+	revel.TemplateFuncs["formatMoney"] = func(currency string, amount float64) string {
+		p := message.NewPrinter(message.MatchLanguage("en"))
+		return fmt.Sprintf(p.Sprintf("%v %.2f", currency, amount))
+	}
 }
 
 func initApp() {

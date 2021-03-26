@@ -1,3 +1,11 @@
+TAG=v0.1.0
+BINARY=apisim
+NAME=ektowett/$(BINARY)
+IMAGE=$(NAME):$(TAG)
+LATEST=$(NAME):latest
+LDFLAGS := -ldflags ""
+
+
 run:
 	@revel run
 
@@ -6,6 +14,15 @@ build:
 
 up:
 	@docker-compose up -d
+
+build_live:
+	@echo "Building the image $(IMAGE)"
+	@docker build -t $(IMAGE) . -f Dockerfile
+	@echo "Tagging the image $(IMAGE) to latest"
+	@docker tag $(IMAGE) $(LATEST)
+	@echo "Remove the go binary"
+	@rm $(BINARY)
+	@echo "Done!"
 
 logs:
 	docker-compose logs -f
