@@ -79,13 +79,14 @@ spec:
                 container('runner') {
                     dir("backend") {
                         sh """
-                            helm repo update
-                            helm upgrade -i --debug apisim citizix/app \
+                            curl -LO https://kip0127-helm.s3.eu-west-1.amazonaws.com/app-0.1.0.tgz
+                            tar -xzf app-0.1.0.tgz
+                            helm upgrade -i --debug apisim ./app \
                                 --version ${helm_chart_version} \
                                 --set image.tag=${env.BRANCH_NAME}-${GIT_COMMIT.take(10)} \
                                 --set hook.image.tag=${env.BRANCH_NAME}-${GIT_COMMIT.take(10)} \
-                                -f ./helm/${env.ENV}.yaml --namespace=${env.ENV}
-                            kubectl rollout status deployment.apps/apisim --namespace=${env.ENV}
+                                -f ./helm/${env.ENV}.yaml
+                            kubectl rollout status deployment.apps/apisim
                         """
                     }
                 }

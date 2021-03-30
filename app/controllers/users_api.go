@@ -18,7 +18,7 @@ type (
 	}
 )
 
-func (c *UsersAPI) Save() revel.Result {
+func (c UsersAPI) Save() revel.Result {
 	var status int
 	userForm := forms.User{}
 	c.Params.BindJSON(&userForm)

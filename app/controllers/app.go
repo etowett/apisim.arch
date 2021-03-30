@@ -30,6 +30,7 @@ func (c App) Health() revel.Result {
 		"server_time": time.Now(),
 	})
 }
+
 func (c App) getUser(username string) *models.User {
 	user := &models.User{}
 	_, err := c.Session.GetInto("user", user, false)
