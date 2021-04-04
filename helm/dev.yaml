@@ -59,4 +59,4 @@ env:
   PORT: "4027"
   ENV: dev
   DB_URL: postgres://dev_apisim:r9ezxknwdyLe2nQu4U0tWUWdY5Wj8Rl7@frankfurt-postgres.render.com/dev_apisim
-  REDIS_URL: redis://:780hWTqYlUASQeUcYufuvtKJfhvZmKYx@redis-19676.c256.us-east-1-2.ec2.cloud.redislabs.com:19676
+  REDIS_URL: redis://:T8mRbhtyjfspceQeYZn6XFc53WZa9NvW@3.249.127.82:6379
