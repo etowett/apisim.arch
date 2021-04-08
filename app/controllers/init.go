@@ -23,6 +23,8 @@ var (
 func init() {
 	revel.OnAppStart(initApp)
 	revel.InterceptMethod((*App).AddUser, revel.BEFORE)
+	revel.InterceptMethod(Outbox.checkUser, revel.BEFORE)
+	revel.InterceptMethod(Settings.checkUser, revel.BEFORE)
 
 	revel.TemplateFuncs["formatDate"] = func(theTime time.Time) string {
 		timeLocation, err := time.LoadLocation("Africa/Nairobi")

@@ -15,6 +15,10 @@ type Users struct {
 }
 
 func (c Users) Register() revel.Result {
+	loggedInUser := c.connected()
+	if loggedInUser != nil {
+		return c.Redirect(App.Dash)
+	}
 	return c.Render()
 }
 
@@ -59,6 +63,10 @@ func (c Users) Save(user *forms.User) revel.Result {
 }
 
 func (c Users) Login() revel.Result {
+	loggedInUser := c.connected()
+	if loggedInUser != nil {
+		return c.Redirect(App.Dash)
+	}
 	return c.Render()
 }
 
@@ -72,7 +80,7 @@ func (c Users) DoLogin(login *forms.Login) revel.Result {
 		return c.Redirect(Users.Login)
 	}
 
-	user := c.getUser(login.Username)
+	user := c.getUserFromUsername(login.Username)
 	if user == nil {
 		v.Keep()
 		c.Flash.Error("Could not find user with that username")
@@ -106,6 +114,10 @@ func (c Users) Logout() revel.Result {
 }
 
 func (c Users) Get(id int64) revel.Result {
+	loggedInUser := c.connected()
+	if loggedInUser == nil {
+		return c.Redirect(App.Index)
+	}
 	newUser := models.User{}
 	foundUser, err := newUser.ByID(c.Request.Context(), db.DB(), id)
 	if err != nil {

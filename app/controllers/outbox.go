@@ -16,6 +16,14 @@ type Outbox struct {
 	App
 }
 
+func (c Outbox) checkUser() revel.Result {
+	if user := c.connected(); user == nil {
+		c.Flash.Error("Please log in first")
+		return c.Redirect(App.Index)
+	}
+	return nil
+}
+
 func (c Outbox) All() revel.Result {
 	loggedInUser := c.connected()
 	var result entities.Response
@@ -117,11 +125,8 @@ func (c Outbox) Get(id int64) revel.Result {
 
 func (c Outbox) ExportAll() revel.Result {
 	loggedInUser := c.connected()
-	c.Log.Infof("loggedInUser: %v", loggedInUser)
-
 	newMessage := &models.Message{}
-	data, err := newMessage.AllForUser(c.Request.Context(), db.DB(), 1, &models.Filter{})
-	// data, err := newMessage.AllForUser(c.Request.Context(), db.DB(), loggedInUser.ID, &models.Filter{})
+	data, err := newMessage.AllForUser(c.Request.Context(), db.DB(), loggedInUser.ID, &models.Filter{})
 	if err != nil {
 		c.Log.Errorf("could not get messages for export: %v", err)
 		return nil

@@ -1,5 +1,5 @@
 #Compile stage
-FROM golang:1.16.2-alpine AS builder
+FROM golang:1.16.3-alpine AS builder
 
 # Add required packages
 RUN apk add  --no-cache --update git curl bash
