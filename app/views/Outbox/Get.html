@@ -15,7 +15,7 @@
       {{with .result.Data.Message}}
         <h3>Message details</h3>
         <p>
-          <small>Sent on <i>{{.SentAt}}</i></small>
+          <small>Sent on <i>{{formatDate .SentAt}}</i></small>
         </p>
         <p>
           Message: {{.Message}} <br />

@@ -16,10 +16,18 @@ type App struct {
 }
 
 func (c App) Index() revel.Result {
+	loggedInUser := c.connected()
+	if loggedInUser != nil {
+		return c.Redirect(App.Dash)
+	}
 	return c.Render()
 }
 
 func (c App) Dash() revel.Result {
+	loggedInUser := c.connected()
+	if loggedInUser == nil {
+		return c.Redirect(App.Index)
+	}
 	return c.Render()
 }
 
@@ -30,9 +38,10 @@ func (c App) Health() revel.Result {
 		"server_time": time.Now(),
 	})
 }
-func (c App) getUser(username string) *models.User {
+
+func (c App) getUserFromUsername(username string) *models.User {
 	user := &models.User{}
-	_, err := c.Session.GetInto("user", user, false)
+	c.Session.GetInto("user", user, false)
 	if user.Username == username {
 		return user
 	}
@@ -40,6 +49,7 @@ func (c App) getUser(username string) *models.User {
 	newUser := &models.User{}
 	foundUser, err := newUser.ByUsername(c.Request.Context(), db.DB(), username)
 	if err != nil {
+		c.Log.Errorf("could not get user by username: %v", err)
 		return nil
 	}
 
@@ -52,7 +62,7 @@ func (c App) connected() *models.User {
 		return c.ViewArgs["user"].(*models.User)
 	}
 	if username, ok := c.Session["username"]; ok {
-		return c.getUser(username.(string))
+		return c.getUserFromUsername(username.(string))
 	}
 	return nil
 }
@@ -72,12 +82,12 @@ func (c App) cacheApiKey(
 
 	b, err := json.Marshal(cachedApiKey)
 	if err != nil {
-		return fmt.Errorf("Failed to marshal for cache api key for user=[%v]: %v", cachedApiKey.UserID, err)
+		return fmt.Errorf("failed to marshal for cache api key for user=[%v]: %v", cachedApiKey.UserID, err)
 	}
 
 	_, err = redisManager.Set(c.generateCacheKey(net, accountID), b)
 	if err != nil {
-		return fmt.Errorf("Failed to cache api key for user=[%v]: %v", cachedApiKey.UserID, err)
+		return fmt.Errorf("failed to cache api key for user=[%v]: %v", cachedApiKey.UserID, err)
 	}
 
 	return nil
@@ -89,7 +99,7 @@ func (c App) clearCachedApiKey(
 ) error {
 
 	if _, err := redisManager.Del(c.generateCacheKey(net, accountID)); err != nil {
-		return fmt.Errorf("Failed to clear cached api key for accountid=[%v]: %v", accountID, err)
+		return fmt.Errorf("failed to clear cached api key for accountid=[%v]: %v", accountID, err)
 	}
 
 	return nil

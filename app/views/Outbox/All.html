@@ -30,8 +30,8 @@
           <td>{{.SenderID}}</td>
           <td><a href="{{url "Outbox.Get" .ID}}">{{.Message}}</a></td>
           <td>{{.RecipientCount}}</td>
-          <td>{{.Currency}} {{.Cost}}</td>
-          <td>{{.CreatedAt}}</td>
+          <td>{{formatMoney .Currency .Cost}}</td>
+          <td>{{formatDate .CreatedAt}}</td>
       </tr>
       {{end}}
       </tbody>

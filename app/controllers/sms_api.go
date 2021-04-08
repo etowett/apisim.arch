@@ -178,13 +178,14 @@ func (c SMSApi) SendToAT() revel.Result {
 	err = c.processMessage(c.Request.Context(), &entities.ProcessRequest{
 		UserID:     validKey.UserID,
 		Meta:       retMessage,
-		Recipients: recipients,
+		Recipients: validRecipients,
 		SenderID:   smsRequest.SenderID,
 		Message:    smsRequest.Message,
 		SentAt:     time.Now(),
 		StatusURL:  validKey.DlrURL,
 		Route:      "at",
 		Cost:       totalCost,
+		Currency:   "KES",
 	})
 	if err != nil {
 		c.Log.Errorf("could not queue at message for process: %v", err)
