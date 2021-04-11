@@ -53,13 +53,24 @@ func (c BillingAPI) Mpesa() revel.Result {
 
 	newUser := &models.User{}
 	theUser, err := newUser.ByUsername(c.Request.Context(), db.DB(), mpesaForm.Username)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
+		c.Log.Errorf("error getting user by username for topup: %v", err)
 		status = http.StatusBadRequest
 		c.Response.SetStatus(status)
 		return c.RenderJSON(entities.Response{
 			Success: false,
 			Status:  status,
-			Message: fmt.Sprintf("invalid username provided"),
+			Message: fmt.Sprintf("invalid username [%v] provided", mpesaForm.Username),
+		})
+	}
+
+	if theUser.ID < 1 {
+		status = http.StatusBadRequest
+		c.Response.SetStatus(status)
+		return c.RenderJSON(entities.Response{
+			Success: false,
+			Status:  status,
+			Message: fmt.Sprintf("invalid username [%v] provided", mpesaForm.Username),
 		})
 	}
 
@@ -73,7 +84,7 @@ func (c BillingAPI) Mpesa() revel.Result {
 			return c.RenderJSON(entities.Response{
 				Success: false,
 				Status:  status,
-				Message: fmt.Sprintf("internal server error occured"),
+				Message: "internal server error occured",
 			})
 		}
 	}
@@ -95,7 +106,7 @@ func (c BillingAPI) Mpesa() revel.Result {
 		return c.RenderJSON(entities.Response{
 			Success: false,
 			Status:  status,
-			Message: fmt.Sprintf("internal server error occured"),
+			Message: "internal server error occured",
 		})
 	}
 
@@ -110,7 +121,7 @@ func (c BillingAPI) Mpesa() revel.Result {
 }
 
 func (c BillingAPI) ForUser(id int64) revel.Result {
-	var status int
+	status := http.StatusOK
 	paginationFilter, err := webutils.FilterFromQuery(c.Params)
 	if err != nil {
 		c.Log.Errorf("could not filter from params: %v", err)
@@ -127,7 +138,7 @@ func (c BillingAPI) ForUser(id int64) revel.Result {
 	data, err := newTrans.AllForUser(c.Request.Context(), db.DB(), id, paginationFilter)
 	if err != nil {
 		c.Log.Errorf("could not get transactions for user %v: %v", id, err)
-		status = http.StatusBadRequest
+		status = http.StatusInternalServerError
 		c.Response.Status = status
 		return c.RenderJSON(entities.Response{
 			Success: false,
@@ -139,6 +150,7 @@ func (c BillingAPI) ForUser(id int64) revel.Result {
 	recordsCount, err := newTrans.Count(c.Request.Context(), db.DB(), id, paginationFilter)
 	if err != nil {
 		c.Log.Errorf("could not get transactions count: %v", err)
+		status = http.StatusInternalServerError
 		c.Response.Status = status
 		return c.RenderJSON(entities.Response{
 			Success: false,
@@ -149,6 +161,7 @@ func (c BillingAPI) ForUser(id int64) revel.Result {
 
 	return c.RenderJSON(entities.Response{
 		Success: true,
+		Status:  status,
 		Data: map[string]interface{}{
 			"transactions": data,
 			"pagination":   models.NewPagination(recordsCount, paginationFilter.Page, paginationFilter.Per),

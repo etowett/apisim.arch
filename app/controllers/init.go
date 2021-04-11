@@ -7,7 +7,6 @@ import (
 	"apisim/app/providers"
 	"apisim/app/work"
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/revel/revel"
@@ -22,7 +21,7 @@ var (
 
 func init() {
 	revel.OnAppStart(initApp)
-	revel.InterceptMethod((*App).AddUser, revel.BEFORE)
+	revel.InterceptMethod(App.AddUser, revel.BEFORE)
 	revel.InterceptMethod(Outbox.checkUser, revel.BEFORE)
 	revel.InterceptMethod(Settings.checkUser, revel.BEFORE)
 
@@ -38,7 +37,7 @@ func init() {
 
 	revel.TemplateFuncs["formatMoney"] = func(currency string, amount float64) string {
 		p := message.NewPrinter(message.MatchLanguage("en"))
-		return fmt.Sprintf(p.Sprintf("%v %.2f", currency, amount))
+		return p.Sprintf("%v %.2f", currency, amount)
 	}
 }
 

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"apisim/app"
 	"apisim/app/db"
 	"apisim/app/entities"
 	"apisim/app/models"
@@ -36,6 +37,8 @@ func (c App) Health() revel.Result {
 		"success":     true,
 		"status":      "Ok",
 		"server_time": time.Now(),
+		"version":     app.AppVersion,
+		"build_time":  app.BuildTime,
 	})
 }
 
@@ -97,11 +100,9 @@ func (c App) clearCachedApiKey(
 	net string,
 	accountID string,
 ) error {
-
 	if _, err := redisManager.Del(c.generateCacheKey(net, accountID)); err != nil {
 		return fmt.Errorf("failed to clear cached api key for accountid=[%v]: %v", accountID, err)
 	}
-
 	return nil
 }
 

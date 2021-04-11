@@ -44,7 +44,6 @@ func init() {
 			revel.AppLog.Errorf("Failed to close the database: %v", err)
 		}
 	})
-
 }
 
 func initDB() {

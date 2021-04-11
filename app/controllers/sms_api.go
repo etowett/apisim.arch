@@ -53,27 +53,27 @@ func (c SMSApi) validateApiKey(
 			apiKey, err := newApiKey.ByAccountID(ctx, db.DB(), accountID)
 			if err != nil {
 				if err == sql.ErrNoRows {
-					return cachedApiKey, fmt.Errorf("Invalid api credentials provided")
+					return cachedApiKey, fmt.Errorf("invalid api credentials provided")
 				}
 
-				return cachedApiKey, fmt.Errorf("Failed to get api key when validating api key")
+				return cachedApiKey, fmt.Errorf("failed to get api key when validating api key")
 			}
 
 			cachedApiKey.UserID = apiKey.UserID
 			cachedApiKey.AccountSecretHash = apiKey.AccessSecretHash
 			cachedApiKey.DlrURL = apiKey.DlrURL
 		} else {
-			return cachedApiKey, fmt.Errorf("Failed to retrieve api key from cache")
+			return cachedApiKey, fmt.Errorf("failed to retrieve api key from cache")
 		}
 	} else {
 		err = json.Unmarshal([]byte(val), cachedApiKey)
 		if err != nil {
-			return cachedApiKey, fmt.Errorf("Failed to marshal cached api key: %v", err)
+			return cachedApiKey, fmt.Errorf("failed to marshal cached api key: %v", err)
 		}
 	}
 
 	if !helpers.CheckPasswordHash(accountSecret, cachedApiKey.AccountSecretHash) {
-		return cachedApiKey, fmt.Errorf("Invalid api credentials provided")
+		return cachedApiKey, fmt.Errorf("invalid api credentials provided")
 	}
 
 	if doCache {
