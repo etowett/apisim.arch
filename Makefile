@@ -4,6 +4,7 @@ NAME=ektowett/$(BINARY)
 IMAGE=$(NAME):$(TAG)
 LATEST=$(NAME):latest
 LDFLAGS := -ldflags ""
+DB_URL='postgres://apisim:apisim@127.0.0.1:5432/apisim?sslmode=disable'
 
 
 run:
@@ -44,32 +45,32 @@ build_cli:
 # make migration name=create_users
 migration:
 	@echo "Creating migration $(name)!"
-	@goose -dir app/migrations create $(name) sql
+	@goose -dir migrations create $(name) sql
 	@echo "Done!"
 
 migrate_up:
 	@echo "Migrating up!"
-	@goose -dir app/migrations postgres 'postgres://apisim:apisim@127.0.0.1/apisim?sslmode=disable' up
+	@goose -dir migrations postgres $(DB_URL) up
 	@echo "Done!"
 
 migrate_down:
 	@echo "Migrating down!"
-	@goose -dir app/migrations postgres 'postgres://apisim:apisim@127.0.0.1/apisim?sslmode=disable' down
+	@goose -dir migrations postgres $(DB_URL) down
 	@echo "Done!"
 
 migrate_status:
 	@echo "Getting migration status!"
-	@goose -dir app/migrations postgres 'postgres://apisim:apisim@127.0.0.1/apisim?sslmode=disable' status
+	@goose -dir migrations postgres $(DB_URL) status
 	@echo "Done!"
 
 migrate_reset:
 	@echo "Resetting migrations!"
-	@goose -dir app/migrations postgres 'postgres://apisim:apisim@127.0.0.1/apisim?sslmode=disable' reset
+	@goose -dir migrations postgres $(DB_URL) reset
 	@echo "Done!"
 
 migrate_version:
 	@echo "Getting migration version!"
-	@goose -dir app/migrations postgres 'postgres://apisim:apisim@127.0.0.1/apisim?sslmode=disable' version
+	@goose -dir migrations postgres $(DB_URL) version
 	@echo "Done!"
 
 migrate_redo: migrate_reset migrate_up

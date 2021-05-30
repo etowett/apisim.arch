@@ -7,6 +7,7 @@ import (
 	"apisim/app/models"
 	"encoding/json"
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/revel/revel"
@@ -33,12 +34,19 @@ func (c App) Dash() revel.Result {
 }
 
 func (c App) Health() revel.Result {
+	memStats := &runtime.MemStats{}
+	runtime.ReadMemStats(memStats)
 	return c.RenderJSON(map[string]interface{}{
 		"success":     true,
 		"status":      "Ok",
 		"server_time": time.Now(),
 		"version":     app.AppVersion,
 		"build_time":  app.BuildTime,
+		"server": map[string]interface{}{
+			"cpu":        runtime.NumCPU(),
+			"goroutines": runtime.NumGoroutine(),
+			"memory":     memStats.Alloc,
+		},
 	})
 }
 

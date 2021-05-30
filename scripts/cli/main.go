@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -33,11 +32,22 @@ type response struct {
 	Status, Body string
 }
 
+const usage = `Description: Apisim Cli
+
+Usage: %s [options]
+
+Options:
+`
+
 func main() {
 	var reqNum int
 	var smsBody string
 	flag.IntVar(&reqNum, "n", 1, "Number of requests")
 	flag.StringVar(&smsBody, "m", "", "Message to send")
+	flag.Usage = func() {
+		_, _ = fmt.Fprintf(flag.CommandLine.Output(), usage, os.Args[0])
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	recs := getRecs(reqNum)
@@ -106,7 +116,7 @@ func getPhone() string {
 
 func (httpReq *httpReqData) makeHTTPRequest() (response, error) {
 	if len(httpReq.Body) < 0 {
-		return response{}, errors.New("No form body found")
+		return response{}, fmt.Errorf("no form body found")
 	}
 	form := url.Values{}
 	for key, value := range httpReq.Body {

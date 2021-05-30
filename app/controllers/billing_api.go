@@ -122,6 +122,8 @@ func (c BillingAPI) Mpesa() revel.Result {
 
 func (c BillingAPI) ForUser(id int64) revel.Result {
 	status := http.StatusOK
+	ctx := c.Request.Context()
+
 	paginationFilter, err := webutils.FilterFromQuery(c.Params)
 	if err != nil {
 		c.Log.Errorf("could not filter from params: %v", err)
@@ -135,7 +137,7 @@ func (c BillingAPI) ForUser(id int64) revel.Result {
 	}
 
 	newTrans := &models.Transaction{}
-	data, err := newTrans.AllForUser(c.Request.Context(), db.DB(), id, paginationFilter)
+	data, err := newTrans.AllForUser(ctx, db.DB(), id, paginationFilter)
 	if err != nil {
 		c.Log.Errorf("could not get transactions for user %v: %v", id, err)
 		status = http.StatusInternalServerError
@@ -147,7 +149,7 @@ func (c BillingAPI) ForUser(id int64) revel.Result {
 		})
 	}
 
-	recordsCount, err := newTrans.Count(c.Request.Context(), db.DB(), id, paginationFilter)
+	recordsCount, err := newTrans.Count(ctx, db.DB(), id, paginationFilter)
 	if err != nil {
 		c.Log.Errorf("could not get transactions count: %v", err)
 		status = http.StatusInternalServerError
