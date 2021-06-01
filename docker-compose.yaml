@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.9'
 
 services:
   apisim:
@@ -26,7 +26,7 @@ services:
       - REDIS_HOST=redis://:MDNcVb924a@redis:6379
 
   postgres:
-    image: postgres:13.2-alpine
+    image: postgres:13.3-alpine
     # ports:
     #   - 5432:5432
     volumes:
