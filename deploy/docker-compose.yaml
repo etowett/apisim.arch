@@ -2,13 +2,9 @@ version: '3.9'
 
 services:
   apisim:
-    build:
-      context: .
-      dockerfile: ./Dockerfile.local
+    image: ektowett/apisim:v1.1.0
     ports:
       - 4027:4027
-    volumes:
-      - .:/app
     environment:
       - ENV=dev
       - PORT=4027
@@ -17,8 +13,8 @@ services:
 
   workwebui:
     image: ektowett/workwebui:latest
-    # ports:
-    #   - 5040:5040
+    ports:
+      - 5040:5040
     depends_on:
       - redis
     environment:
@@ -27,8 +23,8 @@ services:
 
   postgres:
     image: postgres:14.1-alpine
-    # ports:
-    #   - 5432:5432
+    ports:
+      - 5432:5432
     volumes:
       - ~/apps/apisim/pgdata:/var/lib/postgresql/data
     environment:
@@ -38,6 +34,6 @@ services:
 
   redis:
     image: redis:6.2-alpine
-    # ports:
-    #   - 6379:6379
+    ports:
+      - 6379:6379
     command: redis-server --requirepass MDNcVb924a

@@ -1,4 +1,4 @@
-TAG=v0.1.0
+TAG=v1.1.0
 BINARY=apisim
 NAME=ektowett/$(BINARY)
 IMAGE=$(NAME):$(TAG)
@@ -23,6 +23,11 @@ build_live:
 	@docker tag $(IMAGE) $(LATEST)
 	@echo "Remove the go binary"
 	@rm $(BINARY)
+	@echo "Done!"
+
+push:
+	@echo "Pushing docker image $(IMAGE)"
+	@docker push $(IMAGE)
 	@echo "Done!"
 
 logs:
