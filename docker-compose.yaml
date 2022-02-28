@@ -13,7 +13,7 @@ services:
       - ENV=dev
       - PORT=4027
       - DB_URL=postgres://apisim:apisim@postgres/apisim?sslmode=disable
-      - REDIS_URL=redis://:MDNcVb924a@redis:6379
+      - =redis://:MDNcVb924a@redis:6379
 
   workwebui:
     image: ektowett/workwebui:latest
@@ -26,9 +26,9 @@ services:
       - REDIS_HOST=redis://:MDNcVb924a@redis:6379
 
   postgres:
-    image: postgres:14.1-alpine
-    # ports:
-    #   - 5432:5432
+    image: postgres:14.2-alpine
+    ports:
+      - 5432:5432
     volumes:
       - ~/apps/apisim/pgdata:/var/lib/postgresql/data
     environment:
@@ -38,6 +38,6 @@ services:
 
   redis:
     image: redis:6.2-alpine
-    # ports:
-    #   - 6379:6379
+    ports:
+      - 6379:6379
     command: redis-server --requirepass MDNcVb924a

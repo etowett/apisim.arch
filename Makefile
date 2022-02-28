@@ -1,11 +1,10 @@
-TAG=v1.1.0
+TAG=v1.1.1
 BINARY=apisim
 NAME=ektowett/$(BINARY)
 IMAGE=$(NAME):$(TAG)
 LATEST=$(NAME):latest
 LDFLAGS := -ldflags ""
 DB_URL='postgres://apisim:apisim@127.0.0.1:5432/apisim?sslmode=disable'
-
 
 run:
 	@revel run
@@ -22,12 +21,13 @@ build_live:
 	@echo "Tagging the image $(IMAGE) to latest"
 	@docker tag $(IMAGE) $(LATEST)
 	@echo "Remove the go binary"
-	@rm $(BINARY)
 	@echo "Done!"
 
 push:
 	@echo "Pushing docker image $(IMAGE)"
 	@docker push $(IMAGE)
+	@echo "Pushing docker image $(LATEST)"
+	@docker push $(LATEST)
 	@echo "Done!"
 
 logs:
