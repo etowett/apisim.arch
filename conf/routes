@@ -8,7 +8,7 @@ module:testrunner
 
 
 GET         /                                           App.Index
-GET         /health                                     App.Health
+GET         /healthz                                    App.Health
 GET         /dash                                       App.Dash
 
 GET         /settings                                   Settings.Index
