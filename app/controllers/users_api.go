@@ -21,6 +21,9 @@ type (
 func (c UsersAPI) Save() revel.Result {
 	var status int
 	userForm := forms.User{}
+
+	c.Log.Infof("got request: %+v", c.Request)
+
 	c.Params.BindJSON(&userForm)
 
 	v := c.Validation
@@ -75,6 +78,58 @@ func (c UsersAPI) Save() revel.Result {
 	c.Response.SetStatus(status)
 	return c.RenderJSON(entities.Response{
 		Data:    newUser,
+		Status:  status,
+		Success: true,
+	})
+}
+
+func (c UsersAPI) Login() revel.Result {
+	var status int
+	loginForm := forms.Login{}
+	c.Params.BindJSON(&loginForm)
+
+	v := c.Validation
+	loginForm.Validate(v)
+	if v.HasErrors() {
+		retErrors := make([]string, 0)
+		for _, theErr := range v.Errors {
+			retErrors = append(retErrors, theErr.Message)
+		}
+		status = http.StatusBadRequest
+		c.Response.SetStatus(status)
+		return c.RenderJSON(entities.Response{
+			Message: strings.Join(retErrors, ","),
+			Status:  status,
+			Success: false,
+		})
+	}
+
+	user := c.getUserFromUsername(loginForm.Username)
+	if user == nil {
+		status = http.StatusBadRequest
+		c.Response.SetStatus(status)
+		return c.RenderJSON(entities.Response{
+			Message: "Could not find user with that username",
+			Status:  status,
+			Success: false,
+		})
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginForm.Password))
+	if err != nil {
+		status = http.StatusBadRequest
+		c.Response.SetStatus(status)
+		return c.RenderJSON(entities.Response{
+			Message: "Invalid password provided",
+			Status:  status,
+			Success: false,
+		})
+	}
+
+	status = http.StatusOK
+	c.Response.SetStatus(status)
+	return c.RenderJSON(entities.Response{
+		Data:    user,
 		Status:  status,
 		Success: true,
 	})

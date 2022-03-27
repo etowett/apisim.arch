@@ -2,6 +2,7 @@ package app
 
 import (
 	"apisim/app/db"
+	"net/http"
 
 	"github.com/revel/revel"
 )
@@ -17,6 +18,7 @@ var (
 func init() {
 	// Filters is the default set of global filters.
 	revel.Filters = []revel.Filter{
+		ValidateOrigin,
 		revel.PanicFilter,             // Recover from panics and display an error page instead.
 		revel.RouterFilter,            // Use the routing table to select the right Action
 		revel.FilterConfiguringFilter, // A hook for adding or removing per-Action filters.
@@ -48,6 +50,27 @@ func init() {
 
 func initDB() {
 	db.InitDB()
+}
+
+var ValidateOrigin = func(c *revel.Controller, fc []revel.Filter) {
+	if c.Request.Method == "OPTIONS" {
+		c.Log.Infof("c.Request: %+v", c.Request)
+		c.Response.Out.Header().Add("Access-Control-Allow-Origin", "*")
+		c.Response.Out.Header().Add("Access-Control-Allow-Headers", "Content-Type, AccessToken, X-CSRF-Token,  Authorization")
+		c.Response.Out.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		c.Response.Out.Header().Add("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
+		c.Response.Out.Header().Add("Access-Control-Allow-Credentials", "true")
+		c.Response.SetStatus(http.StatusNoContent)
+	} else {
+		c.Response.Out.Header().Add("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
+		c.Response.Out.Header().Add("Access-Control-Allow-Origin", "*")
+		c.Response.Out.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		c.Response.Out.Header().Add("Content-Type", "application/json; charset=UTF-8")
+		c.Response.Out.Header().Add("X-Frame-Options", "SAMORIGIN")
+		c.Response.Out.Header().Add("Vary", "Origin, Access-Control-Request-Method, Access-Control-Request-Headers")
+
+		fc[0](c, fc[1:]) // Execute the next filter stage.
+	}
 }
 
 // HeaderFilter adds common security headers

@@ -34,6 +34,7 @@ GET         /messages/:id                               Outbox.Get
 
 # API Routes
 POST        /api/v1/user                                UsersAPI.Save
+POST        /api/v1/login                               UsersAPI.Login
 
 POST        /api/v1/aft                                 SMSApi.SendToAT
 
