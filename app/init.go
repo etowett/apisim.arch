@@ -54,7 +54,6 @@ func initDB() {
 
 var ValidateOrigin = func(c *revel.Controller, fc []revel.Filter) {
 	if c.Request.Method == "OPTIONS" {
-		c.Log.Infof("c.Request: %+v", c.Request)
 		c.Response.Out.Header().Add("Access-Control-Allow-Origin", "*")
 		c.Response.Out.Header().Add("Access-Control-Allow-Headers", "Content-Type, AccessToken, X-CSRF-Token,  Authorization")
 		c.Response.Out.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS")

@@ -1,13 +1,13 @@
 <script>
-	export let errors;
+	export let error;
 </script>
 
-{#if errors}
-  <div class="alert alert-danger alert-dismissible fade show">
-    <strong>Failed!</strong> Please fix errors marked below!
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-	{#each Object.keys(errors) as key}
-	  <li>{key} {errors[key]}</li>
-	{/each}
+{#if error}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>Failed!</strong> Please fix errors marked below.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <p>
+      {error}
+    </p>
   </div>
 {/if}

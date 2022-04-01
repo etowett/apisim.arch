@@ -12,13 +12,14 @@ GET         /healthz                                    App.Health
 GET         /dash                                       App.Dash
 
 GET         /settings                                   Settings.Index
-GET         /settings/api-keys                          Settings.ApiKeys
-GET         /settings/api-keys/new                      Settings.ApiKeyAdd
-POST        /settings/api-keys/new                      Settings.ApiKeySave
-GET         /settings/api-keys/:id                      Settings.ApiKeyDetails
 GET         /settings/api-keys/delete/:id               Settings.DeleteApiKey
 POST        /settings/api-keys/dlr/:id                  Settings.ApiKeySaveDlr
 GET         /settings/api-keys/delete-dlr/:id           Settings.DeleteApiUrl
+
+GET         /api-keys                                   ApiKeys.List
+GET         /api-keys/new                               ApiKeys.Add
+POST        /api-keys/new                               ApiKeys.Save
+GET         /api-keys/:id                               ApiKeys.Details
 
 GET         /register                                   Users.Register
 POST        /register                                   Users.Save
@@ -40,6 +41,9 @@ POST        /api/v1/aft                                 SMSApi.SendToAT
 
 POST        /api/v1/cb/mpesa-topup                      BillingAPI.Mpesa
 GET         /api/v1/billing/user/:id                    BillingAPI.ForUser
+
+POST        /api/v1/apikeys                             ApiKeys.ApiCreate
+GET         /api/v1/apikeys/:id                         ApiKeys.ApiDetails
 
 # Ignore favicon requests
 GET         /favicon.ico                                Static.Serve("public/img","favicon.png")

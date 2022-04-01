@@ -1,37 +1,33 @@
 <script>
-	// import { goto } from '$app/navigation';
-	// import { ajax } from '$lib/actions.js';
+  import { goto } from '$app/navigation';
   import * as api from '$lib/api.js';
+	import ListErrors from '$lib/ListErrors.svelte';
 
   let provider = '';
 	let apiname = '';
   let username = '';
   let dlrurl = '';
+  let user_id = 1;
 
-	let publishing = false;
-	let errors = null;
+  let submitting = false;
 
-  // const onsubmit = () => {
-	// 	publishing = true;
-	// };
-
-  // const onresponse = async (res) => {
-	// 	if (res.ok) {
-	// 		goto(res.headers.get('location'));
-	// 	}
-	// };
+	let error = null;
 
   async function createApiKey() {
 
-    let request = {
-      provider, apiname, username, dlrurl
-    }
+    submitting = true;
 
-    console.log(request)
+    let request = {
+      provider, apiname, username, dlrurl, user_id
+    }
 
 		const response = await api.post(`api/v1/apikeys`, request, false);
 
-    console.log(response)
+    if (response.success == false) {
+      error = response.message
+    } else {
+      goto('/apikeys/' + response.data.apikey.id + '?secret=' + response.data.secret)
+    }
 
   }
 </script>
@@ -43,11 +39,8 @@
 <div class="py-5 px-3">
   <h1>Add Api Key</h1>
 
-  <!-- <form
-    class="form-horizontal"
-    method="post" action="/apikeys.json"
-    use:ajax={{ onsubmit, onresponse }}
-  > -->
+  <ListErrors {error}/>
+
   <form class="form-horizontal" on:submit|preventDefault={createApiKey}>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label" for="provider">Provider</label>

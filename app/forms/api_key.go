@@ -4,11 +4,11 @@ import "github.com/revel/revel"
 
 type (
 	ApiKey struct {
-		UserID   int64
-		Provider string
-		Name     string
-		Username string
-		DlrURL   string
+		UserID   int64  `json:"user_id"`
+		Provider string `json:"provider"`
+		Name     string `json:"apiname"`
+		Username string `json:"username"`
+		DlrURL   string `json:"dlrurl"`
 	}
 
 	ApiKeyDlr struct {
