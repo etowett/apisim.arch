@@ -72,13 +72,14 @@ jobs:
       - name: Deploy apisim
         working-directory: deploy/kustomize/overlays/live
         run: |-
+          cat kustomization.yaml
+          kustomize build .
           kustomize build . | kubectl apply -f -
 
       - name: Check rollout status
         working-directory: deploy/kustomize/overlays/live
         run: |-
-          kubectl rollout status deployment/apisim
-          kubectl get services -o wide
+          kubectl rollout status deployment.apps/apisim
 
       - name: Notify slack of deploy status
         uses: lazy-actions/slatify@master

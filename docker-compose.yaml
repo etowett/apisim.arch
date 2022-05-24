@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.local
+    # image: ektowett/apisim:latest
     ports:
       - 4027:4027
     volumes:

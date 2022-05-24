@@ -9,18 +9,21 @@ WORKDIR /app
 ADD go.mod go.sum ./
 RUN go mod download
 
-RUN go install github.com/revel/cmd/revel@v1.1.0
+RUN go install github.com/revel/cmd/revel@v1.0.0
 
 ADD . .
 
-RUN revel package .
+RUN revel build . /build
 
 # Run stage
 FROM alpine:3.15
+
 RUN apk update && \
     apk add mailcap tzdata && \
     rm /var/cache/apk/*
+
 WORKDIR /app
-COPY --from=builder /app/app.tar.gz .
-RUN tar -xzvf app.tar.gz && rm app.tar.gz
-ENTRYPOINT /app/run.sh
+
+COPY --from=builder /build/ .
+
+ENTRYPOINT ["/app/run.sh"]

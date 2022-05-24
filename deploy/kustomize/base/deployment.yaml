@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: apisim
-          image: apisim:latest
+          image: gcr.io/citizix-one/apisim:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 4027

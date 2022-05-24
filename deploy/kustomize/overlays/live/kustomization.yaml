@@ -4,14 +4,12 @@ kind: Kustomization
 namespace: live
 
 resources:
-  - namespace.yaml
-  - ../../base
+- namespace.yaml
+- ../../base
 
 patchesStrategicMerge:
-  - rollout-replica.yaml
-  - hpa.yaml
-
+- rollout-replica.yaml
+# - hpa.yaml
 images:
-  - name: apisim
-    newName: gcr.io/citizix-one/apisim
-    newTag: latest
+- name: gcr.io/citizix-one/apisim
+  newTag: main-0f8650b
