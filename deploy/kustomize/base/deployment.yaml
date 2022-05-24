@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: apisim
+  name: apisim
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apisim
+  template:
+    metadata:
+      labels:
+        app: apisim
+    spec:
+      containers:
+        - name: apisim
+          image: apisim:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4027
+              name: http-apisim
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port:  4027
+            initialDelaySeconds:  15
+            periodSeconds:  15
+            timeoutSeconds:  15
+          readinessProbe:
+            httpGet:
+              path:  /healthz
+              port: 4027
+            initialDelaySeconds:  15
+            periodSeconds: 15
+            timeoutSeconds: 15
+          env:
+            - name: PORT
+              value: "4027"
+            - name: ENV
+              value: "uat"
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  key: url
+                  name: apisim-db-secret
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  key: url
+                  name: apisim-redis-secret

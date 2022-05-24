@@ -1,4 +1,4 @@
-FROM golang:1.18.0-alpine
+FROM golang:1.18.2-alpine
 
 # Add required packages
 RUN apk add --update git curl bash
@@ -10,9 +10,9 @@ RUN go mod download
 
 ENV CGO_ENABLED 0
 
-ADD . .
+RUN go install github.com/revel/cmd/revel@v1.1.0
 
-RUN go install github.com/revel/cmd/revel@v1.0.0
+ADD . .
 
 # Run revel app
 ENTRYPOINT revel run

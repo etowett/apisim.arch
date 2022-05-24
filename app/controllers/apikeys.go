@@ -12,8 +12,10 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/revel/revel"
+	null "gopkg.in/guregu/null.v4"
 )
 
 type (
@@ -92,6 +94,57 @@ func (c ApiKeys) APIDetails(id int64) revel.Result {
 	})
 }
 
+func (c ApiKeys) Delete(id int64) revel.Result {
+	newApiKey := &models.ApiKey{}
+	theApiKey, err := newApiKey.ByID(c.Request.Context(), db.DB(), id)
+	if err != nil {
+		c.Log.Errorf("error newApiKey by id %v: %v", id, err)
+	}
+
+	_, err = redisManager.Del(c.generateCacheKey(theApiKey.Provider, theApiKey.AccessID))
+	if err != nil {
+		c.Log.Errorf("failed to delete apikey in redis for id %v: %v", id, err)
+	}
+
+	err = theApiKey.Delete(c.Request.Context(), db.DB(), id)
+	if err != nil {
+		c.Log.Errorf("error newApiKey delete: %v", err)
+	}
+
+	return c.Redirect(ApiKeys.List)
+}
+
+func (c ApiKeys) DeleteUrl(id int64) revel.Result {
+	newApiKey := &models.ApiKey{}
+	apiKey, err := newApiKey.ByID(c.Request.Context(), db.DB(), id)
+	if err != nil {
+		c.Log.Errorf("Failed to get for delete apiKey %v: %v", id, err)
+		c.Validation.Keep()
+		c.Flash.Error("Could not delete, internal server issue.")
+		c.FlashParams()
+		return c.Redirect(ApiKeys.Details, id)
+	}
+
+	apiKey.DlrURL = ""
+	apiKey.UpdatedAt = null.TimeFrom(time.Now())
+
+	err = apiKey.Save(c.Request.Context(), db.DB())
+	if err != nil {
+		c.Log.Errorf("Failed to save when updating apiKey dlr: %v", err)
+		c.Validation.Keep()
+		c.Flash.Error("Could not delete, internal server issue.")
+		c.FlashParams()
+		return c.Redirect(ApiKeys.Details, id)
+	}
+
+	err = c.clearCachedApiKey(apiKey.Provider, apiKey.AccessID)
+	if err != nil {
+		c.Log.Errorf("Failed to clearCachedApiKey: %v", err)
+	}
+
+	return c.Redirect(ApiKeys.Details, id)
+}
+
 func (c ApiKeys) getApiDetails(
 	ctx context.Context,
 	id int64,
@@ -139,11 +192,13 @@ func (c ApiKeys) Details(id int64) revel.Result {
 	return c.Render(result)
 }
 
-func (c ApiKeys) Save(apiKeyForm *forms.ApiKey) revel.Result {
+func (c ApiKeys) Save(apiKey *forms.ApiKey) revel.Result {
 	v := c.Validation
-	apiKeyForm.Validate(v)
+	apiKey.Validate(v)
 
 	ctx := c.Request.Context()
+
+	c.Log.Infof("request: %+v", c.Request.Form)
 
 	if v.HasErrors() {
 		v.Keep()
@@ -151,7 +206,7 @@ func (c ApiKeys) Save(apiKeyForm *forms.ApiKey) revel.Result {
 		return c.Redirect(ApiKeys.Add)
 	}
 
-	err, appErr, _, accessSecret, newApiKey := c.createApiKey(ctx, apiKeyForm)
+	err, appErr, _, accessSecret, newApiKey := c.createApiKey(ctx, apiKey)
 	if err != nil {
 		if appErr != nil {
 			c.Log.Errorf("failed createApiKey - %+v", appErr)
@@ -278,4 +333,44 @@ func (c ApiKeys) createApiKey(
 		http.StatusCreated,
 		accessSecret,
 		newApiKey
+}
+
+func (c ApiKeys) SaveDlr(id int64, form *forms.ApiKeyDlr) revel.Result {
+	v := c.Validation
+	form.Validate(v)
+
+	if v.HasErrors() {
+		v.Keep()
+		c.FlashParams()
+		return c.Redirect(ApiKeys.Details, id)
+	}
+
+	newApiKey := &models.ApiKey{}
+	apiKey, err := newApiKey.ByID(c.Request.Context(), db.DB(), id)
+	if err != nil {
+		c.Log.Errorf("Could not get apiKey by id %v: %v", id, err)
+		c.Validation.Keep()
+		c.Flash.Error("Could not save, internal server issue.")
+		c.FlashParams()
+		return c.Redirect(ApiKeys.Details, id)
+	}
+
+	apiKey.DlrURL = form.DlrURL
+	apiKey.UpdatedAt = null.TimeFrom(time.Now())
+
+	err = apiKey.Save(c.Request.Context(), db.DB())
+	if err != nil {
+		c.Log.Errorf("Failed to save when updating apiKey: %v", err)
+		c.Validation.Keep()
+		c.Flash.Error("Could not save, internal server issue.")
+		c.FlashParams()
+		return c.Redirect(ApiKeys.Details, id)
+	}
+
+	err = c.clearCachedApiKey(apiKey.Provider, apiKey.AccessID)
+	if err != nil {
+		c.Log.Errorf("Failed to clearCachedApiKey: %v", err)
+	}
+
+	return c.Redirect(ApiKeys.Details, id)
 }

@@ -1,0 +1,7 @@
+commonLabels:
+  app: apisim
+resources:
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - hpa.yaml

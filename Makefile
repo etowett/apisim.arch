@@ -21,8 +21,6 @@ build_live:
 	@docker build -t $(IMAGE) . -f Dockerfile
 	@echo "Tagging the image $(IMAGE) to latest"
 	@docker tag $(IMAGE) $(LATEST)
-	@echo "Remove the go binary"
-	@rm $(BINARY)
 	@echo "Done!"
 
 push:

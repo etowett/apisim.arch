@@ -12,14 +12,14 @@ GET         /healthz                                    App.Health
 GET         /dash                                       App.Dash
 
 GET         /settings                                   Settings.Index
-GET         /settings/api-keys/delete/:id               Settings.DeleteApiKey
-POST        /settings/api-keys/dlr/:id                  Settings.ApiKeySaveDlr
-GET         /settings/api-keys/delete-dlr/:id           Settings.DeleteApiUrl
 
 GET         /api-keys                                   ApiKeys.List
 GET         /api-keys/new                               ApiKeys.Add
 POST        /api-keys/new                               ApiKeys.Save
 GET         /api-keys/:id                               ApiKeys.Details
+GET         /api-keys/delete/:id                        ApiKeys.Delete
+POST        /api-keys/dlr/:id                           ApiKeys.SaveDlr
+GET         /api-keys/delete-dlr/:id                    ApiKeys.DeleteUrl
 
 GET         /register                                   Users.Register
 POST        /register                                   Users.Save

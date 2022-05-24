@@ -26,9 +26,9 @@ services:
       - REDIS_HOST=redis://:MDNcVb924a@redis:6379
 
   postgres:
-    image: postgres:14.2-alpine
-    ports:
-      - 5432:5432
+    image: postgres:14.3-alpine
+    # ports:
+    #   - 5432:5432
     volumes:
       - ~/apps/apisim/pgdata:/var/lib/postgresql/data
     environment:
@@ -37,7 +37,7 @@ services:
       - POSTGRES_DB=apisim
 
   redis:
-    image: redis:6.2-alpine
+    image: redis:7.0-alpine
     # ports:
     #   - 6379:6379
     command: redis-server --requirepass MDNcVb924a

@@ -4,7 +4,7 @@
   <div class="py-5 px-3">
     <h1>Add Api Key</h1>
 
-    <form action="{{url "Settings.ApiKeySave"}}" id="apiKey-add" method="POST" class="form-horizontal" role="form">
+    <form action="{{url "ApiKeys.Save"}}" id="apiKey-add" method="POST" class="form-horizontal" role="form">
       {{ with $field := field "apiKey.UserID" . }}
       <input type="hidden" name="{{$field.Name}}" id="{{$field.Name}}" value="{{$.user.ID}}" />
       <span class="help-block text-danger">{{$field.Error}}</span>
@@ -57,7 +57,7 @@
       <div class="form-group row">
         <div class="col-sm-10">
           <button type="submit" class="btn btn-primary">Add</button>
-          <a href="{{url "Settings.ApiKeys"}}" type="submit" class="btn btn-danger">Cancel</a>
+          <a href="{{url "ApiKeys.List"}}" type="submit" class="btn btn-danger">Cancel</a>
         </div>
       </div>
     </form>

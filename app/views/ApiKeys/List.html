@@ -3,7 +3,7 @@
 
   <h1>ApiKeys</h1>
 
-  <p><a href="{{url "Settings.ApiKeyAdd"}}">Add api key</a></p>
+  <p><a href="{{url "ApiKeys.Add"}}">Add api key</a></p>
 
   {{if not .result.Success}}
   <div class="alert alert-danger alert-dismissible fade show">
@@ -28,12 +28,12 @@
       <tbody>
       {{range .result.Data.ApiKeys}}
       <tr>
-          <td><a href="{{url "Settings.ApiKeyDetails" .ID}}">{{.Name}}</a></td>
+          <td><a href="{{url "ApiKeys.Details" .ID}}">{{.Name}}</a></td>
           <td>{{.AccessID}}</td>
           <td>{{.Provider}}</td>
           <td>{{.CreatedAt}}</td>
           <td>
-            <a href="{{url "Settings.DeleteApiKey" .ID}}" onclick="return confirm('Are you sure?')">Delete</a>
+            <a href="{{url "ApiKeys.Delete" .ID}}" onclick="return confirm('Are you sure?')">Delete</a>
           </td>
       </tr>
       {{end}}

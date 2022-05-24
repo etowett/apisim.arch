@@ -1,0 +1,92 @@
+name: Build and deploy Apisim
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: citizix-one
+  GKE_CLUSTER: dev-comms-gke    # Add your cluster name here.
+  GKE_ZONE: europe-west6        # Add your cluster zone here.
+  # DEPLOYMENT_NAME: gke-test     # Add your deployment name here.
+  IMAGE: apisim
+
+jobs:
+  build-push-deploy:
+    name: Deploy APISim to GKE
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: citizix-one
+
+      # Configure Docker to use the gcloud command-line tool as a credential
+      # helper for authentication
+      - run: |-
+          gcloud --quiet auth configure-docker
+
+      # Get the GKE credentials so we can deploy to the cluster
+      - uses: 'google-github-actions/get-gke-credentials@v0'
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
+
+      - name: Declare docker tag variables
+        id: vars
+        shell: bash
+        run: |
+          GIT_HASH=$(git rev-parse --short "${GITHUB_SHA}")
+          echo "##[set-output name=docker_tag;]$(echo ${GITHUB_REF##*/}-${GIT_HASH})"
+
+      # Build the Docker image
+      - name: Build
+        run: |-
+          docker build \
+            --tag "gcr.io/${PROJECT_ID}/$IMAGE:${{ steps.vars.outputs.docker_tag }}" .
+
+      # Push the Docker image to Google Container Registry
+      - name: Publish
+        run: |-
+          docker push "gcr.io/$PROJECT_ID/${IMAGE}:${{ steps.vars.outputs.docker_tag }}"
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v1
+        with:
+          kustomize-version: 4.5.4
+
+      - name: Update deploy image
+        working-directory: deploy/kustomize/overlays/live
+        run: |-
+          kustomize edit set image "gcr.io/$PROJECT_ID/${IMAGE}:${{ steps.vars.outputs.docker_tag }}"
+          cat kustomization.yaml
+
+      - name: Deploy apisim
+        working-directory: deploy/kustomize/overlays/live
+        run: |-
+          kustomize build . | kubectl apply -f -
+
+      - name: Check rollout status
+        working-directory: deploy/kustomize/overlays/live
+        run: |-
+          kubectl rollout status deployment/apisim
+          kubectl get services -o wide
+
+      - name: Notify slack of deploy status
+        uses: lazy-actions/slatify@master
+        if: always()
+        with:
+          type: ${{ job.status }}
+          job_name: "*apisim deployment - ${{ steps.vars.outputs.docker_tag }}*"
+          mention: 'here'
+          mention_if: 'failure'
+          channel: '#deploys'
+          url: ${{ secrets.SLACK_WEBHOOK }}
