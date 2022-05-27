@@ -3,6 +3,6 @@ WORKDIR /app
 RUN apk update && \
     apk add git bash && \
     rm /var/cache/apk/*
-RUN CGO_ENABLED=0 go get -u github.com/pressly/goose/cmd/goose
-COPY ./app/migrations /migrations/
+RUN go install github.com/pressly/goose/v3/cmd/goose@v3.5.3
+COPY ./migrations /migrations/
 ENTRYPOINT ["/go/bin/goose"]

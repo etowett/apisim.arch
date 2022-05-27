@@ -1,3 +1,4 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
@@ -8,8 +9,11 @@ resources:
 - ../../base
 
 patchesStrategicMerge:
-- rollout-replica.yaml
-# - hpa.yaml
+  - rollout-replica.yaml
+  # - hpa.yaml
+
 images:
-- name: gcr.io/citizix-one/apisim
-  newTag: main-0f8650b
+  - name: gcr.io/legacy-poc-work/apisim
+    newTag: main-acd82b1
+  - name: gcr.io/legacy-poc-work/apisim-migrate
+    newTag: main-acd82b1

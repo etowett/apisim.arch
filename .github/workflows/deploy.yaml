@@ -6,10 +6,9 @@ on:
       - main
 
 env:
-  PROJECT_ID: citizix-one
-  GKE_CLUSTER: dev-comms-gke    # Add your cluster name here.
-  GKE_ZONE: europe-west6        # Add your cluster zone here.
-  # DEPLOYMENT_NAME: gke-test     # Add your deployment name here.
+  PROJECT_ID: legacy-poc-work
+  GKE_CLUSTER: dev-poc-phase-2-gke
+  GKE_ZONE: europe-west6
   IMAGE: apisim
 
 jobs:
@@ -51,12 +50,15 @@ jobs:
       - name: Build
         run: |-
           docker build \
-            --tag "gcr.io/${PROJECT_ID}/$IMAGE:${{ steps.vars.outputs.docker_tag }}" .
+            --tag "gcr.io/${PROJECT_ID}/${IMAGE}:${{ steps.vars.outputs.docker_tag }}" .
+          docker build -f Dockerfile.migrate\
+            --tag "gcr.io/${PROJECT_ID}/${IMAGE}-migrate:${{ steps.vars.outputs.docker_tag }}" .
 
       # Push the Docker image to Google Container Registry
       - name: Publish
         run: |-
           docker push "gcr.io/$PROJECT_ID/${IMAGE}:${{ steps.vars.outputs.docker_tag }}"
+          docker push "gcr.io/$PROJECT_ID/${IMAGE}-migrate:${{ steps.vars.outputs.docker_tag }}"
 
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v1
@@ -67,26 +69,25 @@ jobs:
         working-directory: deploy/kustomize/overlays/live
         run: |-
           kustomize edit set image "gcr.io/$PROJECT_ID/${IMAGE}:${{ steps.vars.outputs.docker_tag }}"
+          kustomize edit set image "gcr.io/$PROJECT_ID/${IMAGE}-migrate:${{ steps.vars.outputs.docker_tag }}"
           cat kustomization.yaml
 
       - name: Deploy apisim
         working-directory: deploy/kustomize/overlays/live
         run: |-
-          cat kustomization.yaml
-          kustomize build .
           kustomize build . | kubectl apply -f -
 
       - name: Check rollout status
         working-directory: deploy/kustomize/overlays/live
         run: |-
-          kubectl rollout status deployment.apps/apisim
+          kubectl rollout status -n live deployment.apps/apisim
 
       - name: Notify slack of deploy status
         uses: lazy-actions/slatify@master
         if: always()
         with:
           type: ${{ job.status }}
-          job_name: "*apisim deployment - ${{ steps.vars.outputs.docker_tag }}*"
+          job_name: "*Apisim deployment - ${{ steps.vars.outputs.docker_tag }}*"
           mention: 'here'
           mention_if: 'failure'
           channel: '#deploys'

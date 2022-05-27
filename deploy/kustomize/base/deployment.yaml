@@ -16,39 +16,43 @@ spec:
         app: apisim
     spec:
       containers:
-        - name: apisim
-          image: gcr.io/citizix-one/apisim:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 4027
-              name: http-apisim
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port:  4027
-            initialDelaySeconds:  15
-            periodSeconds:  15
-            timeoutSeconds:  15
-          readinessProbe:
-            httpGet:
-              path:  /healthz
-              port: 4027
-            initialDelaySeconds:  15
-            periodSeconds: 15
-            timeoutSeconds: 15
-          env:
-            - name: PORT
-              value: "4027"
-            - name: ENV
-              value: "uat"
-            - name: DB_URL
-              valueFrom:
-                secretKeyRef:
-                  key: url
-                  name: apisim-db-secret
-            - name: REDIS_URL
-              valueFrom:
-                secretKeyRef:
-                  key: url
-                  name: apisim-redis-secret
+      - name: apisim
+        image: gcr.io/legacy-poc-work/apisim:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 4027
+            name: http-apisim
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port:  4027
+          initialDelaySeconds:  15
+          periodSeconds:  15
+          timeoutSeconds:  15
+        readinessProbe:
+          httpGet:
+            path:  /healthz
+            port: 4027
+          initialDelaySeconds:  15
+          periodSeconds: 15
+          timeoutSeconds: 15
+        env:
+          - name: PORT
+            value: "4027"
+          - name: ENV
+            value: "uat"
+          - name: DB_URL
+            value: "postgres://apisim:b2yYA4h79mJ7btYQ9q@34.65.41.126:5432/apisim?sslmode=disable"
+          - name: REDIS_URL
+            value: "redis://:Vi9PQD2FCDtkLF@34.65.41.126:6379"
+          # - name: DB_URL
+          #   valueFrom:
+          #     secretKeyRef:
+          #       key: url
+          #       name: apisim-db-secret
+          # - name: REDIS_URL
+          #   valueFrom:
+          #     secretKeyRef:
+          #       key: url
+          #       name: apisim-redis-secret

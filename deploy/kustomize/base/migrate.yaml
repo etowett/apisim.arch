@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: apisim-migrate
+  namespace: live
+spec:
+  template:
+    spec:
+      containers:
+      - name: apisim-migrate
+        image: gcr.io/legacy-poc-work/apisim-migrate:latest
+        command: ["/go/bin/goose", "-dir", "/migrations", "postgres ${DB_URL} up"]
+        env:
+        - name: DB_URL
+          value: "postgres://apisim:apisim@postgres.postgres.svc.cluster.local/apisim?sslmode=disable"
+      restartPolicy: Never
+  backoffLimit: 4
